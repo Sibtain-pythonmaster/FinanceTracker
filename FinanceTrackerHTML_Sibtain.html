@@ -10,11 +10,10 @@
 <body class="bg-gradient-to-r from-blue-100 to-blue-200 text-gray-900">
   <div class="max-w-6xl mx-auto p-6 space-y-6">
     <h1 class="text-4xl font-bold text-center mb-4">💰 Finance Tracker v3.0 — “The Complete Edition” By Sibtain</h1>
-<p class="text-center text-lg text-gray-700 max-w-2xl mx-auto">
-  Track your deposits, expenses, recurring bills, and savings goals, all of this will be in one place. 
-  Stay organized, visualize your spending with charts, and manage your money smarter. 💼 Keep checking regurarly UPDATES EVERY MONDAY, (OR MOSTLY EVERY MONDAY😉) Also be sure to buy me a coffee sometime!😃
-</p>
-
+    <p class="text-center text-lg text-gray-700 max-w-2xl mx-auto">
+      Track your deposits, expenses, recurring bills, and savings goals—all in one place.
+      Visualize your spending with charts, and manage your money smarter. 💼 Updates most Mondays. Also… coffee 👇
+    </p>
 
     <!-- Balance Card -->
     <div id="balanceCard" class="p-6 bg-white rounded-2xl shadow-md text-center transition">
@@ -25,9 +24,9 @@
     <!-- Quick Add Buttons -->
     <div class="p-4 bg-white rounded-2xl shadow-md text-center space-x-2">
       <h2 class="font-semibold text-lg mb-2">⚡ Quick Add Expense</h2>
-      <button onclick="quickAdd('Coffee', 5)" class="bg-orange-400 text-white px-3 py-1 rounded hover:bg-orange-500">☕ Coffee - $5</button>
-      <button onclick="quickAdd('Lunch', 12)" class="bg-orange-400 text-white px-3 py-1 rounded hover:bg-orange-500">🍔 Lunch - $12</button>
-      <button onclick="quickAdd('Transport', 10)" class="bg-orange-400 text-white px-3 py-1 rounded hover:bg-orange-500">🚌 Transport - $10</button>
+      <button onclick="quickAdd('Coffee', 5, 'Starbucks coffee')" class="bg-orange-400 text-white px-3 py-1 rounded hover:bg-orange-500">☕ Coffee - $5</button>
+      <button onclick="quickAdd('Lunch', 12, 'Lunch combo')" class="bg-orange-400 text-white px-3 py-1 rounded hover:bg-orange-500">🍔 Lunch - $12</button>
+      <button onclick="quickAdd('Transport', 10, 'Bus fare')" class="bg-orange-400 text-white px-3 py-1 rounded hover:bg-orange-500">🚌 Transport - $10</button>
     </div>
 
     <!-- Progress Bar -->
@@ -44,21 +43,33 @@
         <h2 class="font-semibold text-lg mb-2">➕ Add Deposit</h2>
         <form id="depositForm" class="space-y-2">
           <input type="number" step="0.01" min="0" placeholder="Amount" class="w-full border rounded-lg p-2" required>
+          <input type="text" placeholder="Description (optional)" class="w-full border rounded-lg p-2">
           <button class="w-full bg-green-500 text-white rounded-lg p-2 hover:bg-green-600">Add Deposit</button>
         </form>
       </div>
+
       <div class="p-4 bg-white rounded-2xl shadow-md">
         <h2 class="font-semibold text-lg mb-2">💸 Add Expense</h2>
         <form id="expenseForm" class="space-y-2">
-          <input type="text" placeholder="Category (e.g., Food, Bills)" class="w-full border rounded-lg p-2" required>
-          <input type="number" step="0.01" min="0" placeholder="Amount" class="w-full border rounded-lg p-2" required>
-          <!-- Recurring checkbox -->
+          <!-- New description field to power auto-categorization -->
+          <input id="expenseDesc" type="text" placeholder="Description (e.g., Starbucks coffee, Shell gas)" class="w-full border rounded-lg p-2">
+          <div class="grid grid-cols-2 gap-2">
+            <input id="expenseCategory" type="text" placeholder="Category (auto if blank)" class="w-full border rounded-lg p-2">
+            <input id="expenseAmount" type="number" step="0.01" min="0" placeholder="Amount" class="w-full border rounded-lg p-2" required>
+          </div>
           <label class="flex items-center space-x-2">
             <input type="checkbox" id="recurringExpense" class="h-4 w-4">
             <span>Make this a recurring monthly expense</span>
           </label>
           <button class="w-full bg-red-500 text-white rounded-lg p-2 hover:bg-red-600">Add Expense</button>
         </form>
+
+        <!-- Smart Quick Command -->
+        <div class="mt-3">
+          <label class="block text-sm font-medium text-gray-700 mb-1">🤖 Smart Add (one-liner)</label>
+          <input id="smartAddInput" type="text" placeholder='Try: "Starbucks coffee $6" or "Shell gas 40"' class="w-full border rounded-lg p-2 mb-2">
+          <button onclick="smartAddLine()" class="w-full bg-indigo-500 text-white rounded-lg p-2 hover:bg-indigo-600">Add from Text</button>
+        </div>
       </div>
     </div>
 
@@ -99,11 +110,11 @@
 
     <!-- Charts -->
     <div class="p-4 bg-white rounded-2xl shadow-md">
-      <h2 class="font-semibold text-lg mb-2">📊 Expenses by Category</h2>
+      <h2 class="text-lg font-semibold mb-2">📊 Expenses by Category</h2>
       <canvas id="expenseChart" height="150"></canvas>
     </div>
     <div class="p-4 bg-white rounded-2xl shadow-md">
-      <h2 class="font-semibold text-lg mb-2">📅 Monthly Spending Trend</h2>
+      <h2 class="text-lg font-semibold mb-2">📅 Monthly Spending Trend</h2>
       <canvas id="monthlyChart" height="150"></canvas>
     </div>
 
@@ -126,6 +137,14 @@
       </div>
     </div>
 
+    <!-- 🤖 Smart Assistant Panel -->
+    <div class="p-4 bg-white rounded-2xl shadow-md">
+      <h2 class="font-semibold text-lg mb-2">🤖 Smart Insight</h2>
+      <div id="assistantInsights" class="space-y-2 text-gray-800">
+        <p class="text-sm text-gray-500">Insights will appear as you add data.</p>
+      </div>
+    </div>
+
     <!-- Controls -->
     <div class="text-center space-x-4">
       <button id="resetBtn" class="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500">♻️ Reset All Data</button>
@@ -137,14 +156,18 @@
   </div>
 
   <script>
-    // ===== STATE (with safe upgrade for older saves) =====
+    // ===== STATE (with safe upgrade) =====
     let state = JSON.parse(localStorage.getItem("financeData")) || {
       balance: 0,
       deposits: [],
       expenses: [],
-      goal: { name: "", amount: 0 }
+      recurring: [],
+      goal: { name: "", amount: 0 },
+      lastAppliedMonth: null
     };
-    // upgrade old saves safely
+    // normalize legacy records
+    state.deposits = (state.deposits || []).map(d => ({ amount: d.amount, date: d.date || todayISO(), description: d.description || "" }));
+    state.expenses = (state.expenses || []).map(e => ({ category: e.category || "", amount: e.amount, date: e.date || todayISO(), description: e.description || "" }));
     if (!state.recurring) state.recurring = [];
     if (!state.lastAppliedMonth) state.lastAppliedMonth = null;
 
@@ -158,6 +181,7 @@
     const expenseChartCtx = document.getElementById("expenseChart").getContext("2d");
     const monthlyChartCtx = document.getElementById("monthlyChart").getContext("2d");
     const categoryTotals = document.getElementById("categoryTotals");
+    const assistantInsights = document.getElementById("assistantInsights");
 
     const goalForm = document.getElementById("goalForm");
     const goalArea = document.getElementById("goalArea");
@@ -186,29 +210,54 @@
     // ===== HELPERS =====
     function save() {
       localStorage.setItem("financeData", JSON.stringify(state));
+
+      // Auto-download backup JSON on each change
+      const blob = new Blob([JSON.stringify(state)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "financeData_backup.json";
+      a.click();
+      URL.revokeObjectURL(url);
     }
-    // Normalize any stored date to YYYY-MM key (works with ISO or locale)
+
     function monthKey(dstr) {
-      // If already ISO YYYY-MM-DD
       if (/^\d{4}-\d{2}-\d{2}$/.test(dstr)) return dstr.slice(0,7);
-      // Try to parse locale dates safely
       const d = new Date(dstr);
       if (!isNaN(d)) return d.toISOString().slice(0,7);
-      // Fallback to current month if parsing fails
-      const now = new Date();
-      return now.toISOString().slice(0,7);
+      return new Date().toISOString().slice(0,7);
     }
-    function todayISO() {
-      return new Date().toISOString().slice(0,10);
+    function currentMonthKey() { return new Date().toISOString().slice(0,7); }
+    function todayISO() { return new Date().toISOString().slice(0,10); }
+
+    // ===== LIGHTWEIGHT AI CATEGORIZER =====
+    // Simple keyword→category rules. You can tweak freely.
+    const CATEGORY_RULES = [
+      { cat: "Food", keys: ["starbucks","coffee","cafe","restaurant","mcdonald","burger","pizza","chipotle","lunch","dinner","grocer","supermarket"] },
+      { cat: "Transport", keys: ["uber","lyft","shell","exxon","bp","gas","fuel","bus","train","metro","toll","parking"] },
+      { cat: "Bills", keys: ["utility","electric","water","internet","wifi","phone","mobile","verizon","att","t-mobile","rent","mortgage","insurance"] },
+      { cat: "Shopping", keys: ["amazon","walmart","target","clothes","shoes","apparel","store","mall","costco","best buy"] },
+      { cat: "Entertainment", keys: ["netflix","spotify","disney","movie","cinema","game","xbox","playstation","hulu","concert"] },
+      { cat: "Health", keys: ["pharmacy","cvS","walgreens","doctor","dentist","clinic","gym","fitness","workout","protein"] },
+      { cat: "Education", keys: ["book","tuition","course","udemy","coursera","textbook","school","class"] },
+      { cat: "Travel", keys: ["hotel","airbnb","flight","plane","airline","airport","uber","car rental"] },
+    ];
+    function autoCategoryFromText(text) {
+      if (!text) return "";
+      const t = text.toLowerCase();
+      for (const rule of CATEGORY_RULES) {
+        if (rule.keys.some(k => t.includes(k))) return rule.cat;
+      }
+      return ""; // unknown, let user fill
     }
 
     // ===== RECURRING =====
     function applyRecurringExpenses() {
-      const currentMonth = new Date().toISOString().slice(0,7);
-      if (state.lastAppliedMonth === currentMonth) return; // prevent duplicates
+      const currentMonth = currentMonthKey();
+      if (state.lastAppliedMonth === currentMonth) return;
       state.recurring.forEach(r => {
         state.balance -= r.amount;
-        state.expenses.push({ category: r.category + " (recurring)", amount: r.amount, date: todayISO() });
+        state.expenses.push({ category: r.category + " (recurring)", amount: r.amount, date: todayISO(), description: r.description || "Recurring" });
       });
       state.lastAppliedMonth = currentMonth;
       save();
@@ -223,7 +272,6 @@
           ).join("")
         : "<li>No recurring expenses yet.</li>";
     }
-
     function deleteRecurring(i){
       state.recurring.splice(i,1);
       save();
@@ -235,7 +283,7 @@
     function updateUI() {
       // Sorting & filtering for expenses
       const sortType = document.getElementById("sortSelect").value;
-      const filterText = document.getElementById("filterCategory").value.toLowerCase();
+      const filterText = (document.getElementById("filterCategory").value || "").toLowerCase();
 
       let filtered = [...state.expenses];
       if (filterText) filtered = filtered.filter(e => (e.category || "").toLowerCase().includes(filterText));
@@ -255,7 +303,7 @@
       depositList.innerHTML = "";
       state.deposits.forEach((d, i) => {
         const li = document.createElement("li");
-        li.innerHTML = `💰 +$${d.amount.toFixed(2)} (${d.date})
+        li.innerHTML = `💰 +$${d.amount.toFixed(2)} (${d.date}) ${d.description ? "— " + escapeHtml(d.description) : ""}
           <button onclick="editDeposit(${i})" class='text-xs text-blue-500 ml-2'>✏️</button>
           <button onclick="deleteDeposit(${i})" class='text-xs text-red-500 ml-1'>❌</button>`;
         depositList.appendChild(li);
@@ -266,17 +314,17 @@
       filtered.forEach((e, i) => {
         const li = document.createElement("li");
         li.className = "animate-fadeIn";
-        li.innerHTML = `💸 ${e.category}: -$${e.amount.toFixed(2)} (${e.date})
+        li.innerHTML = `💸 ${e.category || "Uncategorized"}: -$${e.amount.toFixed(2)} (${e.date}) ${e.description ? "— " + escapeHtml(e.description) : ""}
           <button onclick="editExpense(${i})" class='text-xs text-blue-500 ml-2'>✏️</button>
           <button onclick="deleteExpense(${i})" class='text-xs text-red-500 ml-1'>❌</button>`;
         expenseList.appendChild(li);
       });
 
-      // Category totals
+      // Category totals (all-time)
       const catTotals = {};
-      state.expenses.forEach(e => { catTotals[e.category] = (catTotals[e.category] || 0) + e.amount; });
+      state.expenses.forEach(e => { const c = e.category || "Uncategorized"; catTotals[c] = (catTotals[c] || 0) + e.amount; });
       categoryTotals.innerHTML = Object.entries(catTotals)
-        .map(([cat, amt]) => `<li>${cat}: $${amt.toFixed(2)}</li>`).join("") || "<li>No data yet.</li>";
+        .map(([cat, amt]) => `<li>${escapeHtml(cat)}: $${amt.toFixed(2)}</li>`).join("") || "<li>No data yet.</li>";
 
       // Pie chart
       expenseChart.data.labels = Object.keys(catTotals);
@@ -284,7 +332,7 @@
       expenseChart.data.datasets[0].backgroundColor = Object.keys(catTotals).map((_, i) => `hsl(${i * 50},70%,60%)`);
       expenseChart.update();
 
-      // Monthly bar chart (supports ISO or locale dates)
+      // Monthly bar chart
       const months = {}; // { 'YYYY-MM': {exp, dep} }
       state.expenses.forEach(e => {
         const m = monthKey(e.date);
@@ -309,7 +357,13 @@
       progressBar.style.width = percent + "%";
       progressBar.className = "h-4 rounded-full transition-all duration-500 " + (percent > 50 ? "bg-green-500" : percent > 20 ? "bg-yellow-500" : "bg-red-500");
 
+      // Goal UI
       updateGoalUI();
+
+      // Smart Assistant
+      updateAssistant();
+
+      // Persist + backup
       save();
     }
 
@@ -327,41 +381,169 @@
       }
     }
 
-    // --- CRUD + Quick Add Functions ---
+    // ===== SMART ASSISTANT =====
+    function updateAssistant() {
+      const month = currentMonthKey();
+
+      // 1) Current month category totals
+      const monthCat = {};
+      state.expenses.forEach(e => {
+        if (monthKey(e.date) === month) {
+          const c = e.category || "Uncategorized";
+          monthCat[c] = (monthCat[c] || 0) + e.amount;
+        }
+      });
+
+      const entries = Object.entries(monthCat).sort((a,b) => b[1]-a[1]);
+      const top = entries[0];
+
+      // 2) Suggestion: nudge top spend down a bit
+      let suggestionHTML = "";
+      if (top) {
+        const [topCat, topAmt] = top;
+        const suggestedCut = topAmt >= 250 ? 50 : (topAmt >= 100 ? 25 : 10);
+        suggestionHTML = `<li>💡 You spent <b>$${topAmt.toFixed(2)}</b> on <b>${escapeHtml(topCat)}</b> this month. Try reducing by <b>$${suggestedCut}</b> to free up cash.</li>`;
+      }
+
+      // 3) Forecast savings toward goal (use recent 4-week average)
+      let forecastHTML = "";
+      if (state.goal.amount > 0 && state.balance < state.goal.amount) {
+        const remaining = state.goal.amount - state.balance;
+        const weeklyNet = averageWeeklyNet(4); // last ~4 weeks
+        if (weeklyNet > 0) {
+          const weeks = Math.ceil(remaining / weeklyNet);
+          forecastHTML = `<li>📈 At your recent pace (~$${weeklyNet.toFixed(0)}/week), you'll reach your <b>$${state.goal.amount.toFixed(0)}</b> ${escapeHtml(state.goal.name)} goal in about <b>${weeks} week${weeks>1?'s':''}</b>.</li>`;
+        } else {
+          forecastHTML = `<li>⚠️ Your recent weekly net is not positive. Increase savings or cut spending to reach your goal.</li>`;
+        }
+      }
+
+      // 4) Friendly tip if no data
+      if (!top && !forecastHTML) {
+        assistantInsights.innerHTML = `<p class="text-sm text-gray-500">Add some expenses and deposits to see insights here.</p>`;
+        return;
+      }
+
+      assistantInsights.innerHTML = `
+        <ul class="list-disc pl-5 space-y-1">
+          ${suggestionHTML || ""}
+          ${forecastHTML || ""}
+        </ul>
+      `;
+    }
+
+    // Compute average weekly net over N weeks (deposits - expenses)
+    function averageWeeklyNet(weeksBack = 4) {
+      const now = new Date();
+      const start = new Date(now.getTime() - weeksBack * 7 * 24 * 60 * 60 * 1000);
+      const inRange = d => {
+        const dt = new Date(d);
+        return !isNaN(dt) && dt >= start && dt <= now;
+      };
+
+      let dep = 0, exp = 0;
+      state.deposits.forEach(d => { if (inRange(d.date)) dep += d.amount; });
+      state.expenses.forEach(e => { if (inRange(e.date)) exp += e.amount; });
+
+      return (dep - exp) / Math.max(1, weeksBack);
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+    }
+
+    // ===== CRUD + Quick Add =====
     function deleteDeposit(i){ state.balance -= state.deposits[i].amount; state.deposits.splice(i,1); updateUI(); }
     function deleteExpense(i){ state.balance += state.expenses[i].amount; state.expenses.splice(i,1); updateUI(); }
-    function editDeposit(i){ const v = prompt("Edit deposit amount:", state.deposits[i].amount); if (v !== null && !isNaN(parseFloat(v))) { state.balance += parseFloat(v) - state.deposits[i].amount; state.deposits[i].amount = parseFloat(v); updateUI(); } }
-    function editExpense(i){ const v = prompt("Edit expense amount:", state.expenses[i].amount); if (v !== null && !isNaN(parseFloat(v))) { state.balance += state.expenses[i].amount - parseFloat(v); state.expenses[i].amount = parseFloat(v); updateUI(); } }
-    function quickAdd(category, amount){ state.balance -= amount; state.expenses.push({ category, amount, date: todayISO() }); updateUI(); }
 
-    // --- Forms ---
+    function editDeposit(i){
+      const v = prompt("Edit deposit amount:", state.deposits[i].amount);
+      if (v !== null && !isNaN(parseFloat(v))) {
+        state.balance += parseFloat(v) - state.deposits[i].amount;
+        state.deposits[i].amount = parseFloat(v);
+        updateUI();
+      }
+    }
+    function editExpense(i){
+      const v = prompt("Edit expense amount:", state.expenses[i].amount);
+      if (v !== null && !isNaN(parseFloat(v))) {
+        state.balance += state.expenses[i].amount - parseFloat(v);
+        state.expenses[i].amount = parseFloat(v);
+        updateUI();
+      }
+    }
+
+    function quickAdd(category, amount, description="") {
+      state.balance -= amount;
+      state.expenses.push({ category, amount, date: todayISO(), description });
+      updateUI();
+    }
+
+    // Smart one-line add: "Starbucks coffee $6" or "Shell gas 40"
+    function smartAddLine() {
+      const input = document.getElementById("smartAddInput");
+      const line = (input.value || "").trim();
+      if (!line) return;
+
+      // Find last number as amount
+      const match = line.match(/(-?\d+(\.\d{1,2})?)\s*$/);
+      if (!match) { alert("Couldn't find an amount in that line."); return; }
+      const amount = parseFloat(match[1]);
+      const desc = line.replace(match[0], "").trim();
+
+      const cat = autoCategoryFromText(desc) || "Uncategorized";
+      if (!(amount > 0)) { alert("Amount must be positive."); return; }
+
+      state.balance -= amount;
+      state.expenses.push({ category: cat, amount, date: todayISO(), description: desc });
+      input.value = "";
+      updateUI();
+    }
+
+    // ===== Forms =====
     document.getElementById("depositForm").addEventListener("submit", e => {
       e.preventDefault();
       const amount = parseFloat(e.target[0].value);
+      const description = (e.target[1].value || "").trim();
       if (amount > 0) {
         state.balance += amount;
-        state.deposits.push({ amount, date: todayISO() });
+        state.deposits.push({ amount, date: todayISO(), description });
         updateUI();
       }
       e.target.reset();
     });
 
+    // Auto-fill category as user types description
+    const descInput = document.getElementById("expenseDesc");
+    const catInput = document.getElementById("expenseCategory");
+    descInput.addEventListener("input", () => {
+      if (!catInput.value.trim()) {
+        const guess = autoCategoryFromText(descInput.value);
+        catInput.placeholder = guess ? `Auto: ${guess}` : "Category (auto if blank)";
+      }
+    });
+
     document.getElementById("expenseForm").addEventListener("submit", e => {
       e.preventDefault();
-      const category = e.target[0].value.trim();
-      const amount = parseFloat(e.target[1].value);
+      const description = (document.getElementById("expenseDesc").value || "").trim();
+      let category = (document.getElementById("expenseCategory").value || "").trim();
+      const amount = parseFloat(document.getElementById("expenseAmount").value);
       const isRecurring = document.getElementById("recurringExpense").checked;
-      if (category && amount > 0) {
+
+      if (!category) category = autoCategoryFromText(description) || "Uncategorized";
+
+      if (amount > 0) {
         state.balance -= amount;
-        state.expenses.push({ category, amount, date: todayISO() });
+        state.expenses.push({ category, amount, date: todayISO(), description });
         if (isRecurring) {
-          state.recurring.push({ category, amount });
+          state.recurring.push({ category, amount, description });
           alert(`🔁 ${category} added as a recurring monthly expense.`);
         }
         updateUI();
         updateRecurringList();
       }
       e.target.reset();
+      catInput.placeholder = "Category (auto if blank)";
     });
 
     goalForm.addEventListener("submit", e => {
@@ -372,7 +554,7 @@
       e.target.reset();
     });
 
-    // --- Reset / Export / Import ---
+    // ===== Reset / Export / Import =====
     document.getElementById("resetBtn").addEventListener("click", () => {
       if (confirm("Are you sure you want to reset all data?")) {
         state = { balance: 0, deposits: [], expenses: [], recurring: [], goal: { name: "", amount: 0 }, lastAppliedMonth: null };
@@ -386,13 +568,27 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url; a.download = "financeData.json"; a.click();
+      URL.revokeObjectURL(url);
     };
 
     document.getElementById("importFile").addEventListener("change", e => {
       const file = e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = evt => { state = JSON.parse(evt.target.result); if (!state.recurring) state.recurring=[]; if (!state.lastAppliedMonth) state.lastAppliedMonth=null; updateUI(); updateRecurringList(); };
+      reader.onload = evt => {
+        const incoming = JSON.parse(evt.target.result);
+        // merge with defaults
+        state = {
+          balance: incoming.balance || 0,
+          deposits: (incoming.deposits || []).map(d => ({ amount: d.amount, date: d.date || todayISO(), description: d.description || "" })),
+          expenses: (incoming.expenses || []).map(x => ({ category: x.category || "", amount: x.amount, date: x.date || todayISO(), description: x.description || "" })),
+          recurring: (incoming.recurring || []).map(r => ({ category: r.category, amount: r.amount, description: r.description || "" })),
+          goal: incoming.goal || { name: "", amount: 0 },
+          lastAppliedMonth: incoming.lastAppliedMonth || null
+        };
+        updateUI();
+        updateRecurringList();
+      };
       reader.readAsText(file);
     });
 
