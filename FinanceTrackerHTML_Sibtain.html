@@ -83,8 +83,9 @@ Visualize your spending with charts, and manage your money smarter. 💼 Updates
 <form id="expenseForm" class="space-y-2">
 <input id="expenseDesc" type="text" placeholder="Description (e.g., Starbucks coffee)" class="w-full border rounded-lg p-2">
 <div class="grid grid-cols-2 gap-2">
-<input id="expenseCategory" type="text" placeholder="Category (auto if blank)" class="w-full border rounded-lg p-2">
-<input id="expenseAmount" type="number" step="0.01" min="0" placeholder="Amount" class="w-full border rounded-lg p-2" required>
+    <input id="expenseCategory" list="category-suggestions" type="text" placeholder="Category" class="w-full border rounded-lg p-2">
+    <datalist id="category-suggestions"></datalist>
+    <input id="expenseAmount" type="number" step="0.01" min="0" placeholder="Amount" class="w-full border rounded-lg p-2" required>
 </div>
 <label class="flex items-center space-x-2">
 <input type="checkbox" id="recurringExpense" class="h-4 w-4">
@@ -175,6 +176,53 @@ Visualize your spending with charts, and manage your money smarter. 💼 Updates
 </div>
 </div>
 
+<div class="p-6 bg-white rounded-2xl shadow-md text-gray-800">
+    <h2 class="text-xl font-semibold mb-4 text-center">🌱 7 Stages to Financial Freedom</h2>
+    <div class="space-y-4 text-sm">
+        <div>
+            <h3 class="font-bold">1️⃣ Build a Baseline</h3>
+            <p class="ml-5">💰 Track every dollar — no guilt, just awareness.</p>
+            <p class="ml-5">📊 Create a simple budget where your income > expenses.</p>
+            <p class="ml-5">👉 That gap? It’s your Freedom Fund.</p>
+        </div>
+        <div>
+            <h3 class="font-bold">2️⃣ Get Out of the Danger Zone</h3>
+            <p class="ml-5">🔥 Pay off high-interest debt (especially credit cards).</p>
+            <p class="ml-5">🛡️ Build an emergency fund: 3–6 months of living costs.</p>
+            <p class="ml-5">💪 This gives you stability and peace of mind.</p>
+        </div>
+        <div>
+            <h3 class="font-bold">3️⃣ Stabilize and Automate</h3>
+            <p class="ml-5">⚙️ Automate savings + investments so you don’t rely on willpower.</p>
+            <p class="ml-5">🚫 Don’t inflate your lifestyle when your income grows.</p>
+            <p class="ml-5">📈 Keep your money working even when you’re not.</p>
+        </div>
+        <div>
+            <h3 class="font-bold">4️⃣ Invest Intentionally</h3>
+            <p class="ml-5">💼 Focus on assets that grow — index funds, ETFs, diversified portfolios.</p>
+            <p class="ml-5">🐢 Compounding takes time, but it always wins over hype.</p>
+            <p class="ml-5">🤓 Invest in understanding what you own.</p>
+        </div>
+        <div>
+            <h3 class="font-bold">5️⃣ Create Multiple Income Streams</h3>
+            <p class="ml-5">🧠 Learn skills that raise your earning ceiling (coding, finance, marketing…).</p>
+            <p class="ml-5">💻 Build side income — freelance, digital products, or smart investments.</p>
+            <p class="ml-5">🌊 Each new stream adds another layer of freedom.</p>
+        </div>
+        <div>
+            <h3 class="font-bold">6️⃣ Protect and Plan</h3>
+            <p class="ml-5">🏠 Get insurance that protects your income and assets.</p>
+            <p class="ml-5">📜 Learn basic tax strategy — keep more of what you earn.</p>
+            <p class="ml-5">🌴 Think long term: retirement, real estate, or passive income plays.</p>
+        </div>
+        <div>
+            <h3 class="font-bold">7️⃣ The Freedom Zone</h3>
+            <p class="ml-5">🌞 Your assets pay your bills.</p>
+            <p class="ml-5">💼 Work becomes optional, not required.</p>
+            <p class="ml-5">💬 You buy time, not stuff.</p>
+        </div>
+    </div>
+</div>
 
 
 <div class="text-center space-x-4">
@@ -238,6 +286,9 @@ const goalProgress = document.getElementById("goalProgress");
 const goalPercentEl = document.getElementById("goalPercent");
 const goalStatus = document.getElementById("goalStatus");
 
+// ===== LOGIC FLAGS =====
+let categoryManuallyEdited = false;
+
 // ===== CHARTS =====
 const expenseChart = new Chart(expenseChartCtx, {
     type: 'pie',
@@ -293,16 +344,40 @@ function monthKey(dstr) {
 function currentMonthKey() { return new Date().toISOString().slice(0,7); }
 function todayISO() { return new Date().toISOString().slice(0,10); }
 
-// ===== LIGHTWEIGHT AI CATEGORIZER =====
+// ===== COMPREHENSIVE CATEGORY LIST =====
 const CATEGORY_RULES = [
-    { cat: "Food", keys: ["starbucks","coffee","cafe","restaurant","mcdonald","burger","pizza","chipotle","lunch","dinner","grocer","supermarket"] },
-    { cat: "Transport", keys: ["uber","lyft","shell","exxon","bp","gas","fuel","bus","train","metro","toll","parking"] },
-    { cat: "Bills", keys: ["utility","electric","water","internet","wifi","phone","mobile","verizon","att","t-mobile","rent","mortgage","insurance"] },
-    { cat: "Shopping", keys: ["amazon","walmart","target","clothes","shoes","apparel","store","mall","costco","best buy"] },
-    { cat: "Entertainment", keys: ["netflix","spotify","disney","movie","cinema","game","xbox","playstation","hulu","concert"] },
-    { cat: "Health", keys: ["pharmacy","cvs","walgreens","doctor","dentist","clinic","gym","fitness","workout","protein"] },
-    { cat: "Education", keys: ["book","tuition","course","udemy","coursera","textbook","school","class"] },
-    { cat: "Travel", keys: ["hotel","airbnb","flight","plane","airline","airport","uber","car rental"] },
+    // Housing & Home
+    { cat: "Housing", keys: ["rent", "mortgage", "property tax", "hoa"] },
+    { cat: "Utilities", keys: ["electric", "gas", "water", "sewage", "trash", "recycling", "utility", "internet", "wifi", "cable"] },
+    { cat: "Home Goods", keys: ["furniture", "decor", "appliances", "ikea", "wayfair", "lowes", "home depot", "ace hardware", "household supplies", "cleaning"] },
+    { cat: "Maintenance", keys: ["plumber", "electrician", "hvac", "repair", "landscaping", "pest control", "maintenance"] },
+    // Food & Dining
+    { cat: "Groceries", keys: ["groceries", "supermarket", "trader joes", "kroger", "whole foods", "farmers market", "costco", "sams club"] },
+    { cat: "Dining Out", keys: ["restaurant", "dining", "eats", "mcdonalds", "chipotle", "starbucks", "coffee", "cafe", "bar", "brewery", "delivery", "doordash", "uber eats", "grubhub"] },
+    // Transportation
+    { cat: "Auto & Gas", keys: ["gas", "fuel", "ev charging", "car payment", "auto loan", "car insurance", "oil change", "tires", "mechanic", "car wash", "dmv"] },
+    { cat: "Public Transit", keys: ["bus", "train", "subway", "metro", "lyft", "uber", "taxi", "scooter", "bike share", "parking", "toll"] },
+    // Health & Wellness
+    { cat: "Insurance", keys: ["health insurance", "dental insurance", "vision insurance", "life insurance", "disability insurance", "cobra", "premium"] },
+    { cat: "Medical", keys: ["doctor", "dentist", "vision", "optometrist", "hospital", "clinic", "urgent care", "copay", "pharmacy", "cvs", "walgreens", "prescription", "therapy", "counseling"] },
+    { cat: "Fitness", keys: ["gym", "fitness", "yoga", "classpass", "peloton", "workout", "protein"] },
+    // Personal & Shopping
+    { cat: "Personal Care", keys: ["haircut", "salon", "barber", "cosmetics", "skincare", "sephora", "ulta", "toiletries", "spa", "massage"] },
+    { cat: "Shopping", keys: ["clothing", "shoes", "accessories", "mall", "amazon", "walmart", "target", "best buy", "electronics", "fashion"] },
+    { cat: "Entertainment", keys: ["movies", "concert", "theater", "tickets", "sporting event", "netflix", "hulu", "disney+", "spotify", "streaming", "video games", "steam", "playstation", "xbox", "nintendo"] },
+    { cat: "Hobbies", keys: ["hobby", "crafts", "sports gear", "music lessons", "books", "audiobooks"] },
+    // Family & Pets
+    { cat: "Kids", keys: ["childcare", "daycare", "tuition", "school fees", "kids activities", "toys", "baby supplies", "diapers", "allowance"] },
+    { cat: "Pets", keys: ["pet food", "vet", "veterinarian", "grooming", "pet supplies", "pet insurance"] },
+    // Financial & Professional
+    { cat: "Gifts & Donations", keys: ["gift", "present", "birthday", "wedding", "charity", "donation", "tithe", "church"] },
+    { cat: "Financial", keys: ["bank fee", "atm fee", "late fee", "interest charge", "credit card payment", "student loan", "investment", "401k", "stock", "brokerage"] },
+    { cat: "Business", keys: ["business expense", "office supplies", "software", "client dinner", "work travel", "professional development"] },
+    { cat: "Taxes", keys: ["tax", "irs", "property tax", "tax preparation"] },
+    // Travel
+    { cat: "Travel", keys: ["flight", "airline", "hotel", "airbnb", "vacation", "car rental", "trip", "tourism", "souvenir"] },
+    // Default Fallback
+    { cat: "Miscellaneous", keys: ["misc", "other", "uncategorized"] }
 ];
 function autoCategoryFromText(text) {
     if (!text) return "";
@@ -311,6 +386,13 @@ function autoCategoryFromText(text) {
         if (rule.keys.some(k => t.includes(k))) return rule.cat;
     }
     return "";
+}
+
+function populateCategoryDatalist() {
+    const datalist = document.getElementById('category-suggestions');
+    const categories = [...new Set(CATEGORY_RULES.map(rule => rule.cat))]; // Get unique categories
+    categories.sort();
+    datalist.innerHTML = categories.map(cat => `<option value="${cat}"></option>`).join('');
 }
 
 // ===== NET WORTH =====
@@ -602,10 +684,17 @@ document.getElementById("depositForm").addEventListener("submit", e => {
 
 const descInput = document.getElementById("expenseDesc");
 const catInput = document.getElementById("expenseCategory");
+
+// When user types in category, disable auto-generation for this entry
+catInput.addEventListener('input', () => {
+    categoryManuallyEdited = true;
+});
+
+// Auto-generates category from description as user types
 descInput.addEventListener("input", () => {
-    if (!catInput.value.trim()) {
+    if (!categoryManuallyEdited) {
         const guess = autoCategoryFromText(descInput.value);
-        catInput.placeholder = guess ? `Auto: ${guess}` : "Category (auto if blank)";
+        catInput.value = guess; // Continuously update with the best guess
     }
 });
 
@@ -627,7 +716,8 @@ document.getElementById("expenseForm").addEventListener("submit", e => {
         updateUI();
     }
     e.target.reset();
-    catInput.placeholder = "Category (auto if blank)";
+    catInput.value = ""; 
+    categoryManuallyEdited = false; // Reset the flag for the next entry
 });
 
 goalForm.addEventListener("submit", e => {
@@ -677,6 +767,7 @@ document.head.insertAdjacentHTML("beforeend", `<style>
 </style>`);
 
 // Init
+populateCategoryDatalist();
 applyRecurringExpenses();
 updateUI();
 </script>
