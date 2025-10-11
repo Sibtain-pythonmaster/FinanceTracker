@@ -15,11 +15,36 @@ Track your deposits, expenses, recurring bills, and savings goals—all in one p
 Visualize your spending with charts, and manage your money smarter. 💼 Updates most Mondays. Also… coffee 👇
 </p>
 
+<div class="grid md:grid-cols-2 gap-6">
+    <div id="netWorthCard" class="p-6 bg-white rounded-2xl shadow-md text-center">
+        <h2 class="text-xl font-semibold">💎 Net Worth</h2>
+        <p id="netWorth" class="text-3xl font-bold mt-2 text-indigo-600">$0.00</p>
+    </div>
+    <div id="balanceCard" class="p-6 bg-white rounded-2xl shadow-md text-center transition">
+        <h2 class="text-xl font-semibold">🏦 Liquid Balance</h2>
+        <p id="balance" class="text-3xl font-bold mt-2">$0.00</p>
+    </div>
+</div>
 
-
-<div id="balanceCard" class="p-6 bg-white rounded-2xl shadow-md text-center transition">
-<h2 class="text-xl font-semibold">🏦 Balance</h2>
-<p id="balance" class="text-3xl font-bold mt-2">$0.00</p>
+<div class="grid md:grid-cols-2 gap-6">
+    <div class="p-4 bg-white rounded-2xl shadow-md">
+        <h2 class="font-semibold text-lg mb-2">🟢 Assets</h2>
+        <form id="assetForm" class="flex gap-2 mb-2">
+            <input type="text" placeholder="Asset Name (e.g., Savings)" class="w-2/3 border rounded-lg p-2" required>
+            <input type="number" step="0.01" min="0" placeholder="Amount" class="w-1/3 border rounded-lg p-2" required>
+            <button class="bg-green-500 text-white rounded-lg p-2 hover:bg-green-600">Add</button>
+        </form>
+        <ul id="assetList" class="space-y-1 text-green-700"></ul>
+    </div>
+    <div class="p-4 bg-white rounded-2xl shadow-md">
+        <h2 class="font-semibold text-lg mb-2">🔴 Liabilities</h2>
+        <form id="liabilityForm" class="flex gap-2 mb-2">
+            <input type="text" placeholder="Liability Name (e.g., Loan)" class="w-2/3 border rounded-lg p-2" required>
+            <input type="number" step="0.01" min="0" placeholder="Amount" class="w-1/3 border rounded-lg p-2" required>
+            <button class="bg-red-500 text-white rounded-lg p-2 hover:bg-red-600">Add</button>
+        </form>
+        <ul id="liabilityList" class="space-y-1 text-red-700"></ul>
+    </div>
 </div>
 
 <div class="p-4 bg-white rounded-2xl shadow-md text-center space-x-2">
@@ -56,7 +81,7 @@ Visualize your spending with charts, and manage your money smarter. 💼 Updates
 <div class="p-4 bg-white rounded-2xl shadow-md">
 <h2 class="font-semibold text-lg mb-2">💸 Add Expense</h2>
 <form id="expenseForm" class="space-y-2">
-<input id="expenseDesc" type="text" placeholder="Description (e.g., Starbucks coffee, Shell gas)" class="w-full border rounded-lg p-2">
+<input id="expenseDesc" type="text" placeholder="Description (e.g., Starbucks coffee)" class="w-full border rounded-lg p-2">
 <div class="grid grid-cols-2 gap-2">
 <input id="expenseCategory" type="text" placeholder="Category (auto if blank)" class="w-full border rounded-lg p-2">
 <input id="expenseAmount" type="number" step="0.01" min="0" placeholder="Amount" class="w-full border rounded-lg p-2" required>
@@ -80,6 +105,14 @@ Visualize your spending with charts, and manage your money smarter. 💼 Updates
 <button onclick="updateUI()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Apply</button>
 </div>
 
+<div class="p-4 bg-white rounded-2xl shadow-md">
+    <h2 class="font-semibold text-lg mb-2">📜 All Transactions</h2>
+    <ul id="transactionList" class="space-y-1 text-gray-800"></ul>
+    <div id="transactionTotals" class="mt-4 pt-2 border-t border-gray-200 flex justify-between font-bold">
+        </div>
+</div>
+
+
 <div class="grid md:grid-cols-2 gap-6">
 <div class="p-4 bg-white rounded-2xl shadow-md">
 <h2 class="font-semibold text-lg mb-2">📈 Deposits</h2>
@@ -91,7 +124,7 @@ Visualize your spending with charts, and manage your money smarter. 💼 Updates
 </div>
 </div>
 <div class="p-4 bg-white rounded-2xl shadow-md">
-<h2 class="font-semibold text-lg mb-2">🤖 Smart </h2>
+<h2 class="font-semibold text-lg mb-2">🤖 Smart Insights</h2>
 <div id="assistantInsights" class="space-y-2 text-gray-800">
 <p class="text-sm text-gray-500">Insights will appear as you add data.</p>
 </div>
@@ -107,14 +140,22 @@ Visualize your spending with charts, and manage your money smarter. 💼 Updates
 <ul id="categoryTotals" class="space-y-1"></ul>
 </div>
 
-<div class="p-4 bg-white rounded-2xl shadow-md">
-<h2 class="text-lg font-semibold mb-2">📊 Expenses by Category</h2>
-<canvas id="expenseChart" height="150"></canvas>
+<div class="grid md:grid-cols-2 gap-6">
+    <div class="p-4 bg-white rounded-2xl shadow-md">
+        <h2 class="text-lg font-semibold mb-2">💎 Net Worth Trend</h2>
+        <canvas id="netWorthChart" height="150"></canvas>
+        <button onclick="logNetWorth()" class="w-full mt-2 bg-indigo-500 text-white rounded-lg p-2 hover:bg-indigo-600">Log Current Net Worth</button>
+    </div>
+    <div class="p-4 bg-white rounded-2xl shadow-md">
+        <h2 class="text-lg font-semibold mb-2">📊 Expenses by Category</h2>
+        <canvas id="expenseChart" height="150"></canvas>
+    </div>
 </div>
 <div class="p-4 bg-white rounded-2xl shadow-md">
 <h2 class="text-lg font-semibold mb-2">📅 Monthly Spending Trend</h2>
 <canvas id="monthlyChart" height="150"></canvas>
 </div>
+
 
 <div class="p-4 bg-white rounded-2xl shadow-md">
 <h2 class="font-semibold text-lg mb-2">🎯 Savings Goal</h2>
@@ -148,20 +189,26 @@ Visualize your spending with charts, and manage your money smarter. 💼 Updates
 <script>
 // ===== STATE (with safe upgrade) =====
 let state = JSON.parse(localStorage.getItem("financeData")) || {
-balance: 0,
-deposits: [],
-expenses: [],
-recurring: [],
-goal: { name: "", amount: 0 },
-lastAppliedMonth: null,
-lastBackupMonth: null // Property to track monthly backups
+    balance: 0,
+    deposits: [],
+    expenses: [],
+    recurring: [],
+    goal: { name: "", amount: 0 },
+    assets: [],
+    liabilities: [],
+    netWorthHistory: [],
+    lastAppliedMonth: null,
+    lastBackupMonth: null
 };
 // normalize legacy records
 state.deposits = (state.deposits || []).map(d => ({ amount: d.amount, date: d.date || todayISO(), description: d.description || "" }));
 state.expenses = (state.expenses || []).map(e => ({ category: e.category || "", amount: e.amount, date: e.date || todayISO(), description: e.description || "" }));
 if (!state.recurring) state.recurring = [];
+if (!state.assets) state.assets = [];
+if (!state.liabilities) state.liabilities = [];
+if (!state.netWorthHistory) state.netWorthHistory = [];
 if (!state.lastAppliedMonth) state.lastAppliedMonth = null;
-if (!state.lastBackupMonth) state.lastBackupMonth = null; // Handle for existing users
+if (!state.lastBackupMonth) state.lastBackupMonth = null;
 
 // ===== ELEMENTS =====
 const balanceEl = document.getElementById("balance");
@@ -169,12 +216,20 @@ const balanceCard = document.getElementById("balanceCard");
 const progressBar = document.getElementById("progressBar");
 const depositList = document.getElementById("depositList");
 const expenseList = document.getElementById("expenseList");
+const transactionList = document.getElementById("transactionList");
+const transactionTotals = document.getElementById("transactionTotals");
 const recurringList = document.getElementById("recurringList");
-const expenseChartCtx = document.getElementById("expenseChart").getContext("2d");
-const monthlyChartCtx = document.getElementById("monthlyChart").getContext("2d");
 const categoryTotals = document.getElementById("categoryTotals");
 const assistantInsights = document.getElementById("assistantInsights");
-
+// Net Worth Elements
+const netWorthEl = document.getElementById("netWorth");
+const assetList = document.getElementById("assetList");
+const liabilityList = document.getElementById("liabilityList");
+// Chart Elements
+const expenseChartCtx = document.getElementById("expenseChart").getContext("2d");
+const monthlyChartCtx = document.getElementById("monthlyChart").getContext("2d");
+const netWorthChartCtx = document.getElementById("netWorthChart").getContext("2d");
+// Goal Elements
 const goalForm = document.getElementById("goalForm");
 const goalArea = document.getElementById("goalArea");
 const goalNameEl = document.getElementById("goalName");
@@ -185,439 +240,434 @@ const goalStatus = document.getElementById("goalStatus");
 
 // ===== CHARTS =====
 const expenseChart = new Chart(expenseChartCtx, {
-type: 'pie',
-data: { labels: [], datasets: [{ data: [], backgroundColor: [] }] },
-options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+    type: 'pie',
+    data: { labels: [], datasets: [{ data: [], backgroundColor: [] }] },
+    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
 });
 
 const monthlyChart = new Chart(monthlyChartCtx, {
-type: 'bar',
-data: { labels: [], datasets: [
-    { label: 'Deposits', data: [], backgroundColor: 'rgba(75,192,192,0.6)' },
-    { label: 'Expenses', data: [], backgroundColor: 'rgba(255,99,132,0.6)' }
-]},
-options: { responsive: true, scales: { y: { beginAtZero: true } } }
+    type: 'bar',
+    data: { labels: [], datasets: [
+        { label: 'Deposits', data: [], backgroundColor: 'rgba(75,192,192,0.6)' },
+        { label: 'Expenses', data: [], backgroundColor: 'rgba(255,99,132,0.6)' }
+    ]},
+    options: { responsive: true, scales: { y: { beginAtZero: true } } }
+});
+
+const netWorthChart = new Chart(netWorthChartCtx, {
+    type: 'line',
+    data: { labels: [], datasets: [{ 
+        label: 'Net Worth', 
+        data: [], 
+        borderColor: 'rgba(75, 192, 192, 1)',
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        fill: true,
+        tension: 0.1 
+    }] },
+    options: { responsive: true, scales: { y: { beginAtZero: true } } }
 });
 
 // ===== HELPERS =====
 function save() {
     const currentMonth = currentMonthKey();
-
-    // Check if it's a new month to trigger the monthly backup
     if (state.lastBackupMonth !== currentMonth) {
         console.log(`Performing monthly backup for ${currentMonth}...`);
         const blob = new Blob([JSON.stringify(state)], { type: "application/json" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        // Make the backup filename month-specific
         a.download = `financeData_backup_${currentMonth}.json`;
         a.click();
         URL.revokeObjectURL(url);
-
-        // Update the state to reflect that this month's backup is done
         state.lastBackupMonth = currentMonth;
     }
-
-    // Save the entire state (including the updated lastBackupMonth) to localStorage
     localStorage.setItem("financeData", JSON.stringify(state));
 }
 
-
 function monthKey(dstr) {
-if (/^\d{4}-\d{2}-\d{2}$/.test(dstr)) return dstr.slice(0,7);
-const d = new Date(dstr);
-if (!isNaN(d)) return d.toISOString().slice(0,7);
-return new Date().toISOString().slice(0,7);
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dstr)) return dstr.slice(0,7);
+    const d = new Date(dstr);
+    if (!isNaN(d)) return d.toISOString().slice(0,7);
+    return new Date().toISOString().slice(0,7);
 }
 function currentMonthKey() { return new Date().toISOString().slice(0,7); }
 function todayISO() { return new Date().toISOString().slice(0,10); }
 
 // ===== LIGHTWEIGHT AI CATEGORIZER =====
-// Simple keyword→category rules. You can tweak freely.
 const CATEGORY_RULES = [
-{ cat: "Food", keys: ["starbucks","coffee","cafe","restaurant","mcdonald","burger","pizza","chipotle","lunch","dinner","grocer","supermarket"] },
-{ cat: "Transport", keys: ["uber","lyft","shell","exxon","bp","gas","fuel","bus","train","metro","toll","parking"] },
-{ cat: "Bills", keys: ["utility","electric","water","internet","wifi","phone","mobile","verizon","att","t-mobile","rent","mortgage","insurance"] },
-{ cat: "Shopping", keys: ["amazon","walmart","target","clothes","shoes","apparel","store","mall","costco","best buy"] },
-{ cat: "Entertainment", keys: ["netflix","spotify","disney","movie","cinema","game","xbox","playstation","hulu","concert"] },
-{ cat: "Health", keys: ["pharmacy","cvS","walgreens","doctor","dentist","clinic","gym","fitness","workout","protein"] },
-{ cat: "Education", keys: ["book","tuition","course","udemy","coursera","textbook","school","class"] },
-{ cat: "Travel", keys: ["hotel","airbnb","flight","plane","airline","airport","uber","car rental"] },
+    { cat: "Food", keys: ["starbucks","coffee","cafe","restaurant","mcdonald","burger","pizza","chipotle","lunch","dinner","grocer","supermarket"] },
+    { cat: "Transport", keys: ["uber","lyft","shell","exxon","bp","gas","fuel","bus","train","metro","toll","parking"] },
+    { cat: "Bills", keys: ["utility","electric","water","internet","wifi","phone","mobile","verizon","att","t-mobile","rent","mortgage","insurance"] },
+    { cat: "Shopping", keys: ["amazon","walmart","target","clothes","shoes","apparel","store","mall","costco","best buy"] },
+    { cat: "Entertainment", keys: ["netflix","spotify","disney","movie","cinema","game","xbox","playstation","hulu","concert"] },
+    { cat: "Health", keys: ["pharmacy","cvs","walgreens","doctor","dentist","clinic","gym","fitness","workout","protein"] },
+    { cat: "Education", keys: ["book","tuition","course","udemy","coursera","textbook","school","class"] },
+    { cat: "Travel", keys: ["hotel","airbnb","flight","plane","airline","airport","uber","car rental"] },
 ];
 function autoCategoryFromText(text) {
-if (!text) return "";
-const t = text.toLowerCase();
-for (const rule of CATEGORY_RULES) {
-if (rule.keys.some(k => t.includes(k))) return rule.cat;
+    if (!text) return "";
+    const t = text.toLowerCase();
+    for (const rule of CATEGORY_RULES) {
+        if (rule.keys.some(k => t.includes(k))) return rule.cat;
+    }
+    return "";
 }
-return ""; // unknown, let user fill
+
+// ===== NET WORTH =====
+function calculateNetWorth() {
+    const totalAssets = state.assets.reduce((sum, asset) => sum + asset.amount, state.balance);
+    const totalLiabilities = state.liabilities.reduce((sum, liability) => sum + liability.amount, 0);
+    return totalAssets - totalLiabilities;
+}
+
+function logNetWorth() {
+    const today = todayISO();
+    const currentNetWorth = calculateNetWorth();
+    const lastLog = state.netWorthHistory[state.netWorthHistory.length - 1];
+    if (lastLog && lastLog.date === today) {
+        if(!confirm("You already logged your net worth today. Log again?")) return;
+    }
+    state.netWorthHistory.push({ date: today, amount: currentNetWorth });
+    state.netWorthHistory.sort((a,b) => new Date(a.date) - new Date(b.date));
+    updateUI();
 }
 
 // ===== RECURRING =====
 function applyRecurringExpenses() {
-const currentMonth = currentMonthKey();
-if (state.lastAppliedMonth === currentMonth) return;
-state.recurring.forEach(r => {
-state.balance -= r.amount;
-state.expenses.push({ category: r.category + " (recurring)", amount: r.amount, date: todayISO(), description: r.description || "Recurring" });
-});
-state.lastAppliedMonth = currentMonth;
-save();
+    const currentMonth = currentMonthKey();
+    if (state.lastAppliedMonth === currentMonth) return;
+    state.recurring.forEach(r => {
+        state.balance -= r.amount;
+        state.expenses.push({ category: r.category + " (recurring)", amount: r.amount, date: todayISO(), description: r.description || "Recurring" });
+    });
+    state.lastAppliedMonth = currentMonth;
+    save();
 }
 
 function updateRecurringList() {
-recurringList.innerHTML = state.recurring.length
-? state.recurring.map((r, i) =>
-`<li>🔁 ${r.category}: -$${r.amount.toFixed(2)} / month
-<button onclick="deleteRecurring(${i})" class="text-xs text-red-500 ml-2">❌</button>
-</li>`
-).join("")
-: "<li>No recurring expenses yet.</li>";
+    recurringList.innerHTML = state.recurring.length
+        ? state.recurring.map((r, i) => `<li>🔁 ${r.category}: -$${r.amount.toFixed(2)} / month <button onclick="deleteRecurring(${i})" class="text-xs text-red-500 ml-2">❌</button></li>`).join("")
+        : "<li>No recurring expenses yet.</li>";
 }
 function deleteRecurring(i){
-state.recurring.splice(i,1);
-save();
-updateRecurringList();
-updateUI();
+    state.recurring.splice(i,1);
+    save();
+    updateUI();
 }
 
 // ===== UI =====
 function updateUI() {
-// Sorting & filtering for expenses
-const sortType = document.getElementById("sortSelect").value;
-const filterText = (document.getElementById("filterCategory").value || "").toLowerCase();
+    // NET WORTH SECTION
+    netWorthEl.textContent = `$${calculateNetWorth().toFixed(2)}`;
+    assetList.innerHTML = state.assets.map((a, i) => `<li>- ${escapeHtml(a.name)}: $${a.amount.toFixed(2)} <button onclick="deleteAsset(${i})" class="text-xs text-red-500 ml-2">❌</button></li>`).join("");
+    liabilityList.innerHTML = state.liabilities.map((l, i) => `<li>- ${escapeHtml(l.name)}: $${l.amount.toFixed(2)} <button onclick="deleteLiability(${i})" class="text-xs text-red-500 ml-2">❌</button></li>`).join("");
+    netWorthChart.data.labels = state.netWorthHistory.map(h => h.date);
+    netWorthChart.data.datasets[0].data = state.netWorthHistory.map(h => h.amount);
+    netWorthChart.update();
+    
+    // Sorting & filtering for display lists
+    const sortType = document.getElementById("sortSelect").value;
+    const filterText = (document.getElementById("filterCategory").value || "").toLowerCase();
+    let filteredExpenses = [...state.expenses].filter(e => filterText ? (e.category || "").toLowerCase().includes(filterText) : true);
+    if (sortType === "amount") filteredExpenses.sort((a,b) => b.amount - a.amount);
+    else if (sortType === "oldest") filteredExpenses.sort((a,b) => new Date(a.date) - new Date(b.date));
+    else filteredExpenses.sort((a,b) => new Date(b.date) - new Date(a.date));
 
-let filtered = [...state.expenses];
-if (filterText) filtered = filtered.filter(e => (e.category || "").toLowerCase().includes(filterText));
+    // Balance + color
+    balanceEl.textContent = `$${state.balance.toFixed(2)}`;
+    balanceCard.className = "p-6 bg-white rounded-2xl shadow-md text-center transition ";
+    if (state.balance > 100) balanceCard.classList.add("bg-green-100");
+    else if (state.balance >= 0) balanceCard.classList.add("bg-yellow-100");
+    else balanceCard.classList.add("bg-red-100");
 
-if (sortType === "amount") filtered.sort((a,b) => b.amount - a.amount);
-else if (sortType === "oldest") filtered.sort((a,b) => new Date(a.date) - new Date(b.date));
-else filtered.sort((a,b) => new Date(b.date) - new Date(a.date)); // newest
+    // COMBINED TRANSACTION LIST
+    const allTransactions = [
+        ...state.deposits.map(d => ({...d, type: 'deposit'})),
+        ...state.expenses.map(e => ({...e, type: 'expense'}))
+    ].sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    transactionList.innerHTML = allTransactions.length ? allTransactions.map(t => {
+        if (t.type === 'deposit') {
+            return `<li>(${t.date}) ${escapeHtml(t.description) || 'Deposit'} <span class="font-bold text-green-600 float-right">+$${t.amount.toFixed(2)}</span></li>`;
+        } else {
+            const desc = `${escapeHtml(t.category)}: ${escapeHtml(t.description)}`;
+            return `<li>(${t.date}) ${desc || 'Expense'} <span class="font-bold text-red-600 float-right">-$${t.amount.toFixed(2)}</span></li>`;
+        }
+    }).join('') : '<li>No transactions yet.</li>';
 
-// Balance + color
-balanceEl.textContent = `$${state.balance.toFixed(2)}`;
-balanceCard.classList.remove("bg-green-100","bg-yellow-100","bg-red-100");
-if (state.balance > 100) balanceCard.classList.add("bg-green-100");
-else if (state.balance >= 0) balanceCard.classList.add("bg-yellow-100");
-else balanceCard.classList.add("bg-red-100");
+    // Transaction Totals
+    const totalAllDeposits = state.deposits.reduce((sum, d) => sum + d.amount, 0);
+    const totalAllExpenses = state.expenses.reduce((sum, e) => sum + e.amount, 0);
+    transactionTotals.innerHTML = `
+        <span class="text-green-600">Total Deposits: +$${totalAllDeposits.toFixed(2)}</span>
+        <span class="text-red-600">Total Expenses: -$${totalAllExpenses.toFixed(2)}</span>
+    `;
 
-// Deposits list
-depositList.innerHTML = "";
-state.deposits.forEach((d, i) => {
-const li = document.createElement("li");
-li.innerHTML = `💰 +$${d.amount.toFixed(2)} (${d.date}) ${d.description ? "— " + escapeHtml(d.description) : ""}
-<button onclick="editDeposit(${i})" class='text-xs text-blue-500 ml-2'>✏️</button>
-<button onclick="deleteDeposit(${i})" class='text-xs text-red-500 ml-1'>❌</button>`;
-depositList.appendChild(li);
-});
+    // Deposit & Expense lists (separate)
+    depositList.innerHTML = state.deposits.map((d, i) => `<li>💰 +$${d.amount.toFixed(2)} (${d.date}) ${d.description ? "— " + escapeHtml(d.description) : ""} <button onclick="editDeposit(${i})" class='text-xs text-blue-500 ml-2'>✏️</button> <button onclick="deleteDeposit(${i})" class='text-xs text-red-500 ml-1'>❌</button></li>`).join("");
+    expenseList.innerHTML = filteredExpenses.map((e, i) => `<li class="animate-fadeIn">💸 ${e.category || "Uncategorized"}: -$${e.amount.toFixed(2)} (${e.date}) ${e.description ? "— " + escapeHtml(e.description) : ""} <button onclick="editExpense(${i})" class='text-xs text-blue-500 ml-2'>✏️</button> <button onclick="deleteExpense(${i})" class='text-xs text-red-500 ml-1'>❌</button></li>`).join("");
 
-// Expenses list
-expenseList.innerHTML = "";
-filtered.forEach((e, i) => {
-const li = document.createElement("li");
-li.className = "animate-fadeIn";
-li.innerHTML = `💸 ${e.category || "Uncategorized"}: -$${e.amount.toFixed(2)} (${e.date}) ${e.description ? "— " + escapeHtml(e.description) : ""}
-<button onclick="editExpense(${i})" class='text-xs text-blue-500 ml-2'>✏️</button>
-<button onclick="deleteExpense(${i})" class='text-xs text-red-500 ml-1'>❌</button>`;
-expenseList.appendChild(li);
-});
+    // Category totals
+    const catTotals = state.expenses.reduce((acc, e) => {
+        const c = e.category || "Uncategorized";
+        acc[c] = (acc[c] || 0) + e.amount;
+        return acc;
+    }, {});
+    categoryTotals.innerHTML = Object.entries(catTotals).map(([cat, amt]) => `<li>${escapeHtml(cat)}: $${amt.toFixed(2)}</li>`).join("") || "<li>No data yet.</li>";
 
-// Category totals (all-time)
-const catTotals = {};
-state.expenses.forEach(e => { const c = e.category || "Uncategorized"; catTotals[c] = (catTotals[c] || 0) + e.amount; });
-categoryTotals.innerHTML = Object.entries(catTotals)
-.map(([cat, amt]) => `<li>${escapeHtml(cat)}: $${amt.toFixed(2)}</li>`).join("") || "<li>No data yet.</li>";
+    // Pie chart
+    expenseChart.data.labels = Object.keys(catTotals);
+    expenseChart.data.datasets[0].data = Object.values(catTotals);
+    expenseChart.data.datasets[0].backgroundColor = Object.keys(catTotals).map((_, i) => `hsl(${i * 50},70%,60%)`);
+    expenseChart.update();
 
-// Pie chart
-expenseChart.data.labels = Object.keys(catTotals);
-expenseChart.data.datasets[0].data = Object.values(catTotals);
-expenseChart.data.datasets[0].backgroundColor = Object.keys(catTotals).map((_, i) => `hsl(${i * 50},70%,60%)`);
-expenseChart.update();
+    // Monthly bar chart
+    const months = {};
+    [...state.expenses, ...state.deposits].forEach(t => {
+        const m = monthKey(t.date);
+        if (!months[m]) months[m] = {exp:0, dep:0};
+        months[m][t.category ? 'exp' : 'dep'] += t.amount;
+    });
+    const labels = Object.keys(months).sort();
+    monthlyChart.data.labels = labels;
+    monthlyChart.data.datasets[0].data = labels.map(m => months[m].dep);
+    monthlyChart.data.datasets[1].data = labels.map(m => months[m].exp);
+    monthlyChart.update();
 
-// Monthly bar chart
-const months = {}; // { 'YYYY-MM': {exp, dep} }
-state.expenses.forEach(e => {
-const m = monthKey(e.date);
-if (!months[m]) months[m] = {exp:0, dep:0};
-months[m].exp += e.amount;
-});
-state.deposits.forEach(d => {
-const m = monthKey(d.date);
-if (!months[m]) months[m] = {exp:0, dep:0};
-months[m].dep += d.amount;
-});
-const labels = Object.keys(months).sort();
-monthlyChart.data.labels = labels;
-monthlyChart.data.datasets[0].data = labels.map(m => months[m].dep);
-monthlyChart.data.datasets[1].data = labels.map(m => months[m].exp);
-monthlyChart.update();
+    // Progress bar
+    const totalProgressBarDeposits = state.deposits.reduce((a, b) => a + b.amount, 0);
+    const totalProgressBarExpenses = state.expenses.reduce((a, b) => a + b.amount, 0);
+    const percent = totalProgressBarDeposits > 0 ? Math.max(0, ((totalProgressBarDeposits - totalProgressBarExpenses) / totalProgressBarDeposits) * 100) : 100;
+    progressBar.style.width = percent + "%";
+    progressBar.className = "h-4 rounded-full transition-all duration-500 " + (percent > 50 ? "bg-green-500" : percent > 20 ? "bg-yellow-500" : "bg-red-500");
 
-// Progress bar
-const totalDeposits = state.deposits.reduce((a, b) => a + b.amount, 0);
-const totalExpenses = state.expenses.reduce((a, b) => a + b.amount, 0);
-const percent = totalDeposits > 0 ? Math.max(0, ((totalDeposits - totalExpenses) / totalDeposits) * 100) : 100;
-progressBar.style.width = percent + "%";
-progressBar.className = "h-4 rounded-full transition-all duration-500 " + (percent > 50 ? "bg-green-500" : percent > 20 ? "bg-yellow-500" : "bg-red-500");
-
-// Goal UI
-updateGoalUI();
-
-// Smart Assistant
-updateAssistant();
-
-// Persist
-save();
+    updateGoalUI();
+    updateAssistant();
+    updateRecurringList();
+    save();
 }
 
 function updateGoalUI() {
-if (state.goal.amount > 0) {
-goalArea.classList.remove("hidden");
-goalNameEl.textContent = state.goal.name;
-goalAmountEl.textContent = state.goal.amount.toFixed(2);
-const percent = Math.min(100, (state.balance / state.goal.amount) * 100);
-goalProgress.style.width = percent + "%";
-goalPercentEl.textContent = percent.toFixed(1);
-goalStatus.classList.toggle("hidden", state.balance < state.goal.amount);
-} else {
-goalArea.classList.add("hidden");
-}
+    if (state.goal.amount > 0) {
+        goalArea.classList.remove("hidden");
+        goalNameEl.textContent = state.goal.name;
+        goalAmountEl.textContent = state.goal.amount.toFixed(2);
+        const percent = Math.min(100, (state.balance / state.goal.amount) * 100);
+        goalProgress.style.width = percent + "%";
+        goalPercentEl.textContent = percent.toFixed(1);
+        goalStatus.classList.toggle("hidden", state.balance < state.goal.amount);
+    } else {
+        goalArea.classList.add("hidden");
+    }
 }
 
 // ===== SMART ASSISTANT =====
 function updateAssistant() {
-const month = currentMonthKey();
+    const month = currentMonthKey();
+    const monthCat = state.expenses.filter(e => monthKey(e.date) === month).reduce((acc, e) => {
+        const c = e.category || "Uncategorized";
+        acc[c] = (acc[c] || 0) + e.amount;
+        return acc;
+    }, {});
 
-// 1) Current month category totals
-const monthCat = {};
-state.expenses.forEach(e => {
-if (monthKey(e.date) === month) {
-const c = e.category || "Uncategorized";
-monthCat[c] = (monthCat[c] || 0) + e.amount;
-}
-});
+    const topSpend = Object.entries(monthCat).sort((a,b) => b[1]-a[1])[0];
+    let suggestionHTML = "";
+    if (topSpend) {
+        const [topCat, topAmt] = topSpend;
+        const suggestedCut = topAmt >= 250 ? 50 : (topAmt >= 100 ? 25 : 10);
+        suggestionHTML = `<li>💡 You spent <b>$${topAmt.toFixed(2)}</b> on <b>${escapeHtml(topCat)}</b> this month. Consider reducing by <b>$${suggestedCut}</b>.</li>`;
+    }
 
-const entries = Object.entries(monthCat).sort((a,b) => b[1]-a[1]);
-const top = entries[0];
-
-// 2) Suggestion: nudge top spend down a bit
-let suggestionHTML = "";
-if (top) {
-const [topCat, topAmt] = top;
-const suggestedCut = topAmt >= 250 ? 50 : (topAmt >= 100 ? 25 : 10);
-suggestionHTML = `<li>💡 You spent <b>$${topAmt.toFixed(2)}</b> on <b>${escapeHtml(topCat)}</b> this month. Try reducing by <b>$${suggestedCut}</b> to free up cash.</li>`;
-}
-
-// 3) Forecast savings toward goal (use recent 4-week average)
-let forecastHTML = "";
-if (state.goal.amount > 0 && state.balance < state.goal.amount) {
-const remaining = state.goal.amount - state.balance;
-const weeklyNet = averageWeeklyNet(4); // last ~4 weeks
-if (weeklyNet > 0) {
-const weeks = Math.ceil(remaining / weeklyNet);
-forecastHTML = `<li>📈 At your recent pace (~$${weeklyNet.toFixed(0)}/week), you'll reach your <b>$${state.goal.amount.toFixed(0)}</b> ${escapeHtml(state.goal.name)} goal in about <b>${weeks} week${weeks>1?'s':''}</b>.</li>`;
-} else {
-forecastHTML = `<li>⚠️ Your recent weekly net is not positive. Increase savings or cut spending to reach your goal.</li>`;
-}
-}
-
-// 4) Friendly tip if no data
-if (!top && !forecastHTML) {
-assistantInsights.innerHTML = `<p class="text-sm text-gray-500">Add some expenses and deposits to see insights here.</p>`;
-return;
+    let forecastHTML = "";
+    if (state.goal.amount > 0 && state.balance < state.goal.amount) {
+        const remaining = state.goal.amount - state.balance;
+        const weeklyNet = averageWeeklyNet(4);
+        if (weeklyNet > 0) {
+            const weeks = Math.ceil(remaining / weeklyNet);
+            forecastHTML = `<li>📈 At your recent pace (~$${weeklyNet.toFixed(0)}/week), you'll reach your <b>${escapeHtml(state.goal.name)}</b> goal in about <b>${weeks} week${weeks>1?'s':''}</b>.</li>`;
+        } else {
+            forecastHTML = `<li>⚠️ Your recent weekly net is not positive. Increase savings or cut spending to reach your goal.</li>`;
+        }
+    }
+    
+    if (!suggestionHTML && !forecastHTML) {
+        assistantInsights.innerHTML = `<p class="text-sm text-gray-500">Add data to see insights.</p>`;
+        return;
+    }
+    assistantInsights.innerHTML = `<ul class="list-disc pl-5 space-y-1">${suggestionHTML}${forecastHTML}</ul>`;
 }
 
-assistantInsights.innerHTML = `
-<ul class="list-disc pl-5 space-y-1">
-${suggestionHTML || ""}
-${forecastHTML || ""}
-</ul>
-`;
-}
-
-// Compute average weekly net over N weeks (deposits - expenses)
 function averageWeeklyNet(weeksBack = 4) {
-const now = new Date();
-const start = new Date(now.getTime() - weeksBack * 7 * 24 * 60 * 60 * 1000);
-const inRange = d => {
-const dt = new Date(d);
-return !isNaN(dt) && dt >= start && dt <= now;
-};
-
-let dep = 0, exp = 0;
-state.deposits.forEach(d => { if (inRange(d.date)) dep += d.amount; });
-state.expenses.forEach(e => { if (inRange(e.date)) exp += e.amount; });
-
-return (dep - exp) / Math.max(1, weeksBack);
+    const start = new Date(Date.now() - weeksBack * 7 * 24 * 60 * 60 * 1000);
+    const inRange = dateStr => new Date(dateStr) >= start;
+    const dep = state.deposits.reduce((s, d) => s + (inRange(d.date) ? d.amount : 0), 0);
+    const exp = state.expenses.reduce((s, e) => s + (inRange(e.date) ? e.amount : 0), 0);
+    return (dep - exp) / Math.max(1, weeksBack);
 }
 
 function escapeHtml(s) {
-return String(s).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+    return String(s).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 }
 
-// ===== CRUD + Quick Add =====
-function deleteDeposit(i){ state.balance -= state.deposits[i].amount; state.deposits.splice(i,1); updateUI(); }
-function deleteExpense(i){ state.balance += state.expenses[i].amount; state.expenses.splice(i,1); updateUI(); }
+// ===== CRUD + FORMS =====
+function deleteDeposit(i){ state.balance -= state.deposits.splice(i,1)[0].amount; updateUI(); }
+function deleteExpense(i){ state.balance += state.expenses.splice(i,1)[0].amount; updateUI(); }
+function deleteAsset(i){ state.assets.splice(i,1); updateUI(); }
+function deleteLiability(i){ state.liabilities.splice(i,1); updateUI(); }
 
 function editDeposit(i){
-const v = prompt("Edit deposit amount:", state.deposits[i].amount);
-if (v !== null && !isNaN(parseFloat(v))) {
-state.balance += parseFloat(v) - state.deposits[i].amount;
-state.deposits[i].amount = parseFloat(v);
-updateUI();
-}
+    const v = prompt("Edit deposit amount:", state.deposits[i].amount);
+    if (v !== null && !isNaN(parseFloat(v))) {
+        state.balance += parseFloat(v) - state.deposits[i].amount;
+        state.deposits[i].amount = parseFloat(v);
+        updateUI();
+    }
 }
 function editExpense(i){
-const v = prompt("Edit expense amount:", state.expenses[i].amount);
-if (v !== null && !isNaN(parseFloat(v))) {
-state.balance += state.expenses[i].amount - parseFloat(v);
-state.expenses[i].amount = parseFloat(v);
-updateUI();
-}
+    const v = prompt("Edit expense amount:", state.expenses[i].amount);
+    if (v !== null && !isNaN(parseFloat(v))) {
+        state.balance += state.expenses[i].amount - parseFloat(v);
+        state.expenses[i].amount = parseFloat(v);
+        updateUI();
+    }
 }
 
 function quickAdd(category, amount, description="") {
-state.balance -= amount;
-state.expenses.push({ category, amount, date: todayISO(), description });
-updateUI();
+    state.balance -= amount;
+    state.expenses.push({ category, amount, date: todayISO(), description });
+    updateUI();
 }
 
-// Universal Smart Add for expenses, deposits, and goals
 function smartAddLine() {
     const input = document.getElementById("smartAddInput");
     const line = (input.value || "").trim();
     if (!line) return;
-
-    // Find a MANDATORY '$' and the last number as amount
     const match = line.match(/\$\s*(\d+(\.\d{1,2})?)\s*$/);
-    if (!match) {
-        alert("Input must include a dollar sign ($) and an amount at the end.");
-        return;
-    }
+    if (!match) { alert("Input must include a dollar sign ($) and an amount."); return; }
+    
     const amount = parseFloat(match[1]);
     const text = line.replace(match[0], "").trim().toLowerCase();
+    if (amount <= 0) { alert("Amount must be positive."); return; }
 
-    if (amount <= 0) {
-        alert("Amount must be a positive number.");
-        return;
-    }
-
-    // Check for keywords to determine the action
     if (text.startsWith('deposit ') || text.startsWith('income ')) {
-        const description = text.split(' ').slice(1).join(' ').trim();
+        const description = text.split(' ').slice(1).join(' ');
         state.balance += amount;
         state.deposits.push({ amount, date: todayISO(), description });
     } else if (text.startsWith('goal ')) {
-        const name = text.split(' ').slice(1).join(' ').trim();
-        if (name) {
-            state.goal = { name, amount };
-        } else {
-            alert("Please provide a name for your goal.");
-            return;
-        }
-    } else { // Default to expense
+        const name = text.split(' ').slice(1).join(' ');
+        if (name) state.goal = { name, amount }; else { alert("Please provide a goal name."); return; }
+    } else {
         const description = text;
         const category = autoCategoryFromText(description) || "Uncategorized";
         state.balance -= amount;
         state.expenses.push({ category, amount, date: todayISO(), description });
     }
-
     input.value = "";
     updateUI();
 }
 
-
-// ===== Forms =====
-document.getElementById("depositForm").addEventListener("submit", e => {
-e.preventDefault();
-const amount = parseFloat(e.target[0].value);
-const description = (e.target[1].value || "").trim();
-if (amount > 0) {
-state.balance += amount;
-state.deposits.push({ amount, date: todayISO(), description });
-updateUI();
-}
-e.target.reset();
+document.getElementById("assetForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const name = e.target[0].value.trim();
+    const amount = parseFloat(e.target[1].value);
+    if (name && amount > 0) {
+        state.assets.push({ name, amount });
+        updateUI();
+    }
+    e.target.reset();
 });
 
-// Auto-fill category as user types description
+document.getElementById("liabilityForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const name = e.target[0].value.trim();
+    const amount = parseFloat(e.target[1].value);
+    if (name && amount > 0) {
+        state.liabilities.push({ name, amount });
+        updateUI();
+    }
+    e.target.reset();
+});
+
+document.getElementById("depositForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const amount = parseFloat(e.target[0].value);
+    const description = (e.target[1].value || "").trim();
+    if (amount > 0) {
+        state.balance += amount;
+        state.deposits.push({ amount, date: todayISO(), description });
+        updateUI();
+    }
+    e.target.reset();
+});
+
 const descInput = document.getElementById("expenseDesc");
 const catInput = document.getElementById("expenseCategory");
 descInput.addEventListener("input", () => {
-if (!catInput.value.trim()) {
-const guess = autoCategoryFromText(descInput.value);
-catInput.placeholder = guess ? `Auto: ${guess}` : "Category (auto if blank)";
-}
+    if (!catInput.value.trim()) {
+        const guess = autoCategoryFromText(descInput.value);
+        catInput.placeholder = guess ? `Auto: ${guess}` : "Category (auto if blank)";
+    }
 });
 
 document.getElementById("expenseForm").addEventListener("submit", e => {
-e.preventDefault();
-const description = (document.getElementById("expenseDesc").value || "").trim();
-let category = (document.getElementById("expenseCategory").value || "").trim();
-const amount = parseFloat(document.getElementById("expenseAmount").value);
-const isRecurring = document.getElementById("recurringExpense").checked;
+    e.preventDefault();
+    const description = (document.getElementById("expenseDesc").value || "").trim();
+    let category = (document.getElementById("expenseCategory").value || "").trim();
+    const amount = parseFloat(document.getElementById("expenseAmount").value);
+    const isRecurring = document.getElementById("recurringExpense").checked;
 
-if (!category) category = autoCategoryFromText(description) || "Uncategorized";
-
-if (amount > 0) {
-state.balance -= amount;
-state.expenses.push({ category, amount, date: todayISO(), description });
-if (isRecurring) {
-state.recurring.push({ category, amount, description });
-alert(`🔁 ${category} added as a recurring monthly expense.`);
-}
-updateUI();
-updateRecurringList();
-}
-e.target.reset();
-catInput.placeholder = "Category (auto if blank)";
+    if (!category) category = autoCategoryFromText(description) || "Uncategorized";
+    if (amount > 0) {
+        state.balance -= amount;
+        state.expenses.push({ category, amount, date: todayISO(), description });
+        if (isRecurring) {
+            state.recurring.push({ category, amount, description });
+            alert(`🔁 ${category} added as a recurring monthly expense.`);
+        }
+        updateUI();
+    }
+    e.target.reset();
+    catInput.placeholder = "Category (auto if blank)";
 });
 
 goalForm.addEventListener("submit", e => {
-e.preventDefault();
-const name = e.target[0].value.trim();
-const amount = parseFloat(e.target[1].value);
-if (name && amount > 0) { state.goal = { name, amount }; updateUI(); }
-e.target.reset();
+    e.preventDefault();
+    const name = e.target[0].value.trim();
+    const amount = parseFloat(e.target[1].value);
+    if (name && amount > 0) { state.goal = { name, amount }; updateUI(); }
+    e.target.reset();
 });
 
-// ===== Reset / Export / Import =====
+// ===== DATA MGMT =====
 document.getElementById("resetBtn").addEventListener("click", () => {
-if (confirm("Are you sure you want to reset all data?")) {
-state = { balance: 0, deposits: [], expenses: [], recurring: [], goal: { name: "", amount: 0 }, lastAppliedMonth: null, lastBackupMonth: null };
-updateUI();
-updateRecurringList();
-}
+    if (confirm("Are you sure you want to reset all data?")) {
+        state = { balance: 0, deposits: [], expenses: [], recurring: [], goal: {name:"", amount:0}, assets:[], liabilities:[], netWorthHistory:[], lastAppliedMonth:null, lastBackupMonth:null };
+        updateUI();
+    }
 });
 
 document.getElementById("exportBtn").onclick = () => {
-const blob = new Blob([JSON.stringify(state)], { type: "application/json" });
-const url = URL.createObjectURL(blob);
-const a = document.createElement("a");
-a.href = url; a.download = "financeData.json"; a.click();
-URL.revokeObjectURL(url);
+    const blob = new Blob([JSON.stringify(state)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = "financeData.json"; a.click();
+    URL.revokeObjectURL(url);
 };
 
 document.getElementById("importFile").addEventListener("change", e => {
-const file = e.target.files[0];
-if (!file) return;
-const reader = new FileReader();
-reader.onload = evt => {
-const incoming = JSON.parse(evt.target.result);
-// merge with defaults
-state = {
-balance: incoming.balance || 0,
-deposits: (incoming.deposits || []).map(d => ({ amount: d.amount, date: d.date || todayISO(), description: d.description || "" })),
-expenses: (incoming.expenses || []).map(x => ({ category: x.category || "", amount: x.amount, date: x.date || todayISO(), description: x.description || "" })),
-recurring: (incoming.recurring || []).map(r => ({ category: r.category, amount: r.amount, description: r.description || "" })),
-goal: incoming.goal || { name: "", amount: 0 },
-lastAppliedMonth: incoming.lastAppliedMonth || null,
-lastBackupMonth: incoming.lastBackupMonth || null // Handle imported data
-};
-updateUI();
-updateRecurringList();
-};
-reader.readAsText(file);
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = evt => {
+        try {
+            const incoming = JSON.parse(evt.target.result);
+            state = { ...state, ...incoming };
+            updateUI();
+        } catch (error) {
+            alert("Error importing file. It may be corrupted.");
+        }
+    };
+    reader.readAsText(file);
 });
 
 // --- Animations ---
@@ -628,7 +678,6 @@ document.head.insertAdjacentHTML("beforeend", `<style>
 
 // Init
 applyRecurringExpenses();
-updateRecurringList();
 updateUI();
 </script>
 </body>
