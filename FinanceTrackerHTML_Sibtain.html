@@ -63,7 +63,7 @@ Visualize your spending with charts, and manage your money smarter. 💼 Updates
 
 <div class="p-4 bg-white rounded-2xl shadow-md">
     <label class="block text-center font-semibold text-lg mb-2">🤖 Smart Add Command</label>
-    <input id="smartAddInput" type="text" placeholder='Try: "coffee $5" or "deposit paycheck $1000" or "goal vacation $2000"' class="w-full border rounded-lg p-2 mb-2 text-center">
+    <input id="smartAddInput" type="text" placeholder='Try: "spent 50 on groceries" or "paycheck 1500" or "save for vacation 2500"' class="w-full border rounded-lg p-2 mb-2 text-center">
     <button onclick="smartAddLine()" class="w-full bg-indigo-500 text-white rounded-lg p-2 hover:bg-indigo-600">Add from Text</button>
 </div>
 
@@ -344,6 +344,94 @@ function monthKey(dstr) {
 function currentMonthKey() { return new Date().toISOString().slice(0,7); }
 function todayISO() { return new Date().toISOString().slice(0,10); }
 
+// ===== NEW SMART ADD PARSER =====
+const EXPENSE_KEYS = ['spent', 'paid', 'bought', 'buy', 'charge', 'cost', 'bill', 'purchase', 'exp', 'for', 'on', 'at'];
+const DEPOSIT_KEYS = ['deposit', 'got', 'received', 'add', 'income', 'paycheck', 'salary', 'bonus', 'earned'];
+const GOAL_KEYS = ['goal', 'save for', 'saving for', 'set goal', 'target', 'wishlist'];
+
+function parseSmartAdd(userInput) {
+    let originalInput = userInput;
+    userInput = userInput.toLowerCase().trim();
+
+    // 1. Find the Amount (handles $50, 50, 120.50)
+    const amountMatch = userInput.match(/\$?(\d+\.?\d*)/);
+    if (!amountMatch) return { error: "Could not find an amount." };
+    
+    const amount = parseFloat(amountMatch[1]);
+    userInput = userInput.replace(amountMatch[0], ''); // Remove the amount for easier parsing
+
+    // 2. Determine the Intent
+    let intent = 'expense'; // Default to expense
+    if (GOAL_KEYS.some(key => userInput.includes(key))) {
+        intent = 'goal';
+    } else if (DEPOSIT_KEYS.some(key => userInput.includes(key)) || originalInput.startsWith('+')) {
+        intent = 'deposit';
+    }
+
+    // 3. Extract the Date
+    let date = todayISO();
+    if (userInput.includes('yesterday')) {
+        const d = new Date();
+        d.setDate(d.getDate() - 1);
+        date = d.toISOString().slice(0, 10);
+        userInput = userInput.replace('yesterday', '');
+    } else if (userInput.includes('today')) {
+        userInput = userInput.replace('today', '');
+    }
+
+    // 4. Clean up the Description
+    const allKeys = [...EXPENSE_KEYS, ...DEPOSIT_KEYS, ...GOAL_KEYS];
+    let description = userInput;
+    allKeys.forEach(key => {
+        description = description.replace(new RegExp(`\\b${key}\\b`, 'g'), '');
+    });
+    
+    description = description.replace(/\s+/g, ' ').trim().replace(/^[^\w]+|[^\w]+$/g, ""); // Remove extra spaces and leading/trailing symbols
+
+    return { intent, amount, description: description || "Smart Add", date };
+}
+
+function smartAddLine() {
+    const inputEl = document.getElementById('smartAddInput');
+    const command = inputEl.value.trim();
+    if (!command) return;
+
+    const result = parseSmartAdd(command);
+
+    if (result.error) {
+        alert(result.error);
+        return;
+    }
+
+    switch (result.intent) {
+        case 'deposit':
+            state.balance += result.amount;
+            state.deposits.push({
+                amount: result.amount,
+                description: result.description,
+                date: result.date
+            });
+            break;
+        case 'goal':
+            state.goal = { name: result.description, amount: result.amount };
+            break;
+        case 'expense':
+        default:
+            const category = autoCategoryFromText(result.description);
+            state.balance -= result.amount;
+            state.expenses.push({
+                category: category,
+                amount: result.amount,
+                description: result.description,
+                date: result.date
+            });
+            break;
+    }
+
+    inputEl.value = '';
+    updateUI();
+}
+
 // ===== COMPREHENSIVE CATEGORY LIST =====
 const CATEGORY_RULES = [
     // Housing & Home
@@ -375,7 +463,7 @@ const CATEGORY_RULES = [
     { cat: "Business", keys: ["business expense", "office supplies", "software", "client dinner", "work travel", "professional development"] },
     { cat: "Taxes", keys: ["tax", "irs", "property tax", "tax preparation"] },
     // Travel
-    { cat: "Travel", keys: ["flight", "airline", "hotel", "airbnb", "vacation", "car rental", "trip", "tourism", "souvenir"] },
+    { cat: "Travel", keys: ["flight", "airline", "hotel", "airbnb", "vacation", "trip", "tourism", "souvenir"] },
     // Default Fallback
     { cat: "Miscellaneous", keys: ["misc", "other", "uncategorized"] }
 ];
@@ -616,160 +704,130 @@ function editExpense(i){
 
 function quickAdd(category, amount, description="") {
     state.balance -= amount;
-    state.expenses.push({ category, amount, date: todayISO(), description });
+    state.expenses.push({ category, amount, description, date: todayISO() });
     updateUI();
 }
 
-function smartAddLine() {
-    const input = document.getElementById("smartAddInput");
-    const line = (input.value || "").trim();
-    if (!line) return;
-    const match = line.match(/\$\s*(\d+(\.\d{1,2})?)\s*$/);
-    if (!match) { alert("Input must include a dollar sign ($) and an amount."); return; }
-    
-    const amount = parseFloat(match[1]);
-    const text = line.replace(match[0], "").trim().toLowerCase();
-    if (amount <= 0) { alert("Amount must be positive."); return; }
-
-    if (text.startsWith('deposit ') || text.startsWith('income ')) {
-        const description = text.split(' ').slice(1).join(' ');
-        state.balance += amount;
-        state.deposits.push({ amount, date: todayISO(), description });
-    } else if (text.startsWith('goal ')) {
-        const name = text.split(' ').slice(1).join(' ');
-        if (name) state.goal = { name, amount }; else { alert("Please provide a goal name."); return; }
-    } else {
-        const description = text;
-        const category = autoCategoryFromText(description) || "Uncategorized";
-        state.balance -= amount;
-        state.expenses.push({ category, amount, date: todayISO(), description });
-    }
-    input.value = "";
+// ===== INITIALIZATION & EVENT LISTENERS =====
+document.addEventListener("DOMContentLoaded", () => {
+    applyRecurringExpenses();
     updateUI();
-}
+    populateCategoryDatalist();
 
-document.getElementById("assetForm").addEventListener("submit", e => {
-    e.preventDefault();
-    const name = e.target[0].value.trim();
-    const amount = parseFloat(e.target[1].value);
-    if (name && amount > 0) {
-        state.assets.push({ name, amount });
-        updateUI();
-    }
-    e.target.reset();
-});
-
-document.getElementById("liabilityForm").addEventListener("submit", e => {
-    e.preventDefault();
-    const name = e.target[0].value.trim();
-    const amount = parseFloat(e.target[1].value);
-    if (name && amount > 0) {
-        state.liabilities.push({ name, amount });
-        updateUI();
-    }
-    e.target.reset();
-});
-
-document.getElementById("depositForm").addEventListener("submit", e => {
-    e.preventDefault();
-    const amount = parseFloat(e.target[0].value);
-    const description = (e.target[1].value || "").trim();
-    if (amount > 0) {
-        state.balance += amount;
-        state.deposits.push({ amount, date: todayISO(), description });
-        updateUI();
-    }
-    e.target.reset();
-});
-
-const descInput = document.getElementById("expenseDesc");
-const catInput = document.getElementById("expenseCategory");
-
-// When user types in category, disable auto-generation for this entry
-catInput.addEventListener('input', () => {
-    categoryManuallyEdited = true;
-});
-
-// Auto-generates category from description as user types
-descInput.addEventListener("input", () => {
-    if (!categoryManuallyEdited) {
-        const guess = autoCategoryFromText(descInput.value);
-        catInput.value = guess; // Continuously update with the best guess
-    }
-});
-
-document.getElementById("expenseForm").addEventListener("submit", e => {
-    e.preventDefault();
-    const description = (document.getElementById("expenseDesc").value || "").trim();
-    let category = (document.getElementById("expenseCategory").value || "").trim();
-    const amount = parseFloat(document.getElementById("expenseAmount").value);
-    const isRecurring = document.getElementById("recurringExpense").checked;
-
-    if (!category) category = autoCategoryFromText(description) || "Uncategorized";
-    if (amount > 0) {
-        state.balance -= amount;
-        state.expenses.push({ category, amount, date: todayISO(), description });
-        if (isRecurring) {
-            state.recurring.push({ category, amount, description });
-            alert(`🔁 ${category} added as a recurring monthly expense.`);
-        }
-        updateUI();
-    }
-    e.target.reset();
-    catInput.value = ""; 
-    categoryManuallyEdited = false; // Reset the flag for the next entry
-});
-
-goalForm.addEventListener("submit", e => {
-    e.preventDefault();
-    const name = e.target[0].value.trim();
-    const amount = parseFloat(e.target[1].value);
-    if (name && amount > 0) { state.goal = { name, amount }; updateUI(); }
-    e.target.reset();
-});
-
-// ===== DATA MGMT =====
-document.getElementById("resetBtn").addEventListener("click", () => {
-    if (confirm("Are you sure you want to reset all data?")) {
-        state = { balance: 0, deposits: [], expenses: [], recurring: [], goal: {name:"", amount:0}, assets:[], liabilities:[], netWorthHistory:[], lastAppliedMonth:null, lastBackupMonth:null };
-        updateUI();
-    }
-});
-
-document.getElementById("exportBtn").onclick = () => {
-    const blob = new Blob([JSON.stringify(state)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url; a.download = "financeData.json"; a.click();
-    URL.revokeObjectURL(url);
-};
-
-document.getElementById("importFile").addEventListener("change", e => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = evt => {
-        try {
-            const incoming = JSON.parse(evt.target.result);
-            state = { ...state, ...incoming };
+    document.getElementById('depositForm').addEventListener('submit', e => {
+        e.preventDefault();
+        const amount = parseFloat(e.target[0].value);
+        const description = e.target[1].value;
+        if (amount > 0) {
+            state.balance += amount;
+            state.deposits.push({ amount, description, date: todayISO() });
+            e.target.reset();
             updateUI();
-        } catch (error) {
-            alert("Error importing file. It may be corrupted.");
         }
-    };
-    reader.readAsText(file);
+    });
+
+    const expenseForm = document.getElementById('expenseForm');
+    const expenseDescEl = document.getElementById('expenseDesc');
+    const expenseCatEl = document.getElementById('expenseCategory');
+    
+    // Auto-suggest category from description
+    expenseDescEl.addEventListener('input', () => {
+        if (!categoryManuallyEdited) {
+            expenseCatEl.value = autoCategoryFromText(expenseDescEl.value);
+        }
+    });
+    expenseCatEl.addEventListener('input', () => { categoryManuallyEdited = true; });
+
+    expenseForm.addEventListener('submit', e => {
+        e.preventDefault();
+        const amount = parseFloat(document.getElementById('expenseAmount').value);
+        if (amount > 0) {
+            const desc = expenseDescEl.value;
+            const cat = expenseCatEl.value || autoCategoryFromText(desc) || "Miscellaneous";
+            const isRecurring = document.getElementById('recurringExpense').checked;
+            
+            if (isRecurring) {
+                state.recurring.push({ category: cat, amount: amount, description: desc });
+            } else {
+                state.balance -= amount;
+                state.expenses.push({ category: cat, amount: amount, description: desc, date: todayISO() });
+            }
+            e.target.reset();
+            categoryManuallyEdited = false; // Reset flag after submission
+            updateUI();
+        }
+    });
+
+    document.getElementById('assetForm').addEventListener('submit', e => {
+        e.preventDefault();
+        const name = e.target[0].value;
+        const amount = parseFloat(e.target[1].value);
+        if (name && amount >= 0) {
+            state.assets.push({name, amount});
+            e.target.reset();
+            updateUI();
+        }
+    });
+
+    document.getElementById('liabilityForm').addEventListener('submit', e => {
+        e.preventDefault();
+        const name = e.target[0].value;
+        const amount = parseFloat(e.target[1].value);
+        if (name && amount >= 0) {
+            state.liabilities.push({name, amount});
+            e.target.reset();
+            updateUI();
+        }
+    });
+
+    goalForm.addEventListener('submit', e => {
+        e.preventDefault();
+        state.goal.name = e.target[0].value;
+        state.goal.amount = parseFloat(e.target[1].value);
+        e.target.reset();
+        updateUI();
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+        if (confirm("Are you sure you want to reset ALL data? This cannot be undone.")) {
+            localStorage.removeItem("financeData");
+            location.reload();
+        }
+    });
+
+    document.getElementById('exportBtn').addEventListener('click', () => {
+        const dataStr = JSON.stringify(state, null, 2);
+        const blob = new Blob([dataStr], {type: 'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'finance_data.json';
+        a.click();
+        URL.revokeObjectURL(url);
+    });
+
+    document.getElementById('importFile').addEventListener('change', e => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                try {
+                    const importedState = JSON.parse(event.target.result);
+                    // simple validation
+                    if ('balance' in importedState && 'expenses' in importedState) {
+                        state = importedState;
+                        updateUI();
+                    } else {
+                        alert("Invalid file format.");
+                    }
+                } catch (err) {
+                    alert("Error parsing file: " + err.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+    });
 });
-
-// --- Animations ---
-document.head.insertAdjacentHTML("beforeend", `<style>
-.animate-fadeIn { animation: fadeIn 0.4s ease-in; }
-@keyframes fadeIn { from {opacity:0; transform:translateY(6px);} to {opacity:1; transform:translateY(0);} }
-</style>`);
-
-// Init
-populateCategoryDatalist();
-applyRecurringExpenses();
-updateUI();
 </script>
 </body>
 </html>
