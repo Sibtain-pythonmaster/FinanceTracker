@@ -4,260 +4,296 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Personal Finance Tracker</title>
-<link rel="icon" type="image/png" href="coin-favicon.png"> <script src="https://cdn.tailwindcss.com"></script>
+<link rel="icon" type="image/png" href="coin-favicon.png">
+<script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-gradient-to-r from-blue-100 to-blue-200 text-gray-900">
 <div class="max-w-6xl mx-auto p-6 space-y-6">
-<h1 class="text-4xl font-bold text-center mb-4">💰 Finance Tracker v3.0 — “The Complete Edition” By Sibtain</h1>
-<p class="text-center text-lg text-gray-700 max-w-2xl mx-auto">
-Track your deposits, expenses, recurring bills, and savings goals—all in one place.
-Visualize your spending with charts, and manage your money smarter. 💼 Updates most Mondays. Also… coffee 👇
-</p>
+    <h1 class="text-4xl font-bold text-center mb-4">💰 Finance Tracker v3.0 — “The Complete Edition” By Sibtain</h1>
+    <p class="text-center text-lg text-gray-700 max-w-2xl mx-auto">
+        Track your deposits, expenses, recurring bills, and savings goals—all in one place.
+        Visualize your spending with charts, and manage your money smarter. 💼 Updates most Mondays. Also… coffee 👇
+    </p>
 
-<div class="grid md:grid-cols-2 gap-6">
-    <div id="netWorthCard" class="p-6 bg-white rounded-2xl shadow-md text-center">
-        <h2 class="text-xl font-semibold">💎 Net Worth</h2>
-        <p id="netWorth" class="text-3xl font-bold mt-2 text-indigo-600">$0.00</p>
+    <div class="grid md:grid-cols-2 gap-6">
+        <div id="netWorthCard" class="p-6 bg-white rounded-2xl shadow-md text-center">
+            <h2 class="text-xl font-semibold">💎 Net Worth</h2>
+            <p id="netWorth" class="text-3xl font-bold mt-2 text-indigo-600">$0.00</p>
+        </div>
+        <div id="balanceCard" class="p-6 bg-white rounded-2xl shadow-md text-center transition">
+            <h2 class="text-xl font-semibold">🏦 Liquid Balance</h2>
+            <p id="balance" class="text-3xl font-bold mt-2">$0.00</p>
+        </div>
     </div>
-    <div id="balanceCard" class="p-6 bg-white rounded-2xl shadow-md text-center transition">
-        <h2 class="text-xl font-semibold">🏦 Liquid Balance</h2>
-        <p id="balance" class="text-3xl font-bold mt-2">$0.00</p>
-    </div>
-</div>
 
-<div class="grid md:grid-cols-2 gap-6">
+    <div class="grid md:grid-cols-2 gap-6">
+        <div class="p-4 bg-white rounded-2xl shadow-md">
+            <h2 class="font-semibold text-lg mb-2">🟢 Assets</h2>
+            <form id="assetForm" class="flex gap-2 mb-2">
+                <input type="text" placeholder="Asset Name (e.g., Savings)" class="w-2/3 border rounded-lg p-2" required>
+                <input type="number" step="0.01" min="0" placeholder="Amount" class="w-1/3 border rounded-lg p-2" required>
+                <button class="bg-green-500 text-white rounded-lg p-2 hover:bg-green-600 active:scale-95 transition-transform">Add</button>
+            </form>
+            <ul id="assetList" class="space-y-1 text-green-700"></ul>
+        </div>
+        <div class="p-4 bg-white rounded-2xl shadow-md">
+            <h2 class="font-semibold text-lg mb-2">🔴 Liabilities</h2>
+            <form id="liabilityForm" class="flex gap-2 mb-2">
+                <input type="text" placeholder="Liability Name (e.g., Loan)" class="w-2/3 border rounded-lg p-2" required>
+                <input type="number" step="0.01" min="0" placeholder="Amount" class="w-1/3 border rounded-lg p-2" required>
+                <button class="bg-red-500 text-white rounded-lg p-2 hover:bg-red-600 active:scale-95 transition-transform">Add</button>
+            </form>
+            <ul id="liabilityList" class="space-y-1 text-red-700"></ul>
+        </div>
+    </div>
+
+    <div class="p-4 bg-white rounded-2xl shadow-md text-center space-x-2">
+        <h2 class="font-semibold text-lg mb-2">⚡ Quick Add Expense</h2>
+        <button onclick="quickAdd('Coffee', 5, 'Starbucks coffee')" class="bg-orange-400 text-white px-3 py-1 rounded hover:bg-orange-500 active:scale-95 transition-transform">☕ Coffee - $5</button>
+        <button onclick="quickAdd('Lunch', 12, 'Lunch combo')" class="bg-orange-400 text-white px-3 py-1 rounded hover:bg-orange-500 active:scale-95 transition-transform">🍔 Lunch - $12</button>
+        <button onclick="quickAdd('Transport', 10, 'Bus fare')" class="bg-orange-400 text-white px-3 py-1 rounded hover:bg-orange-500 active:scale-95 transition-transform">🚌 Transport - $10</button>
+    </div>
+
     <div class="p-4 bg-white rounded-2xl shadow-md">
-        <h2 class="font-semibold text-lg mb-2">🟢 Assets</h2>
-        <form id="assetForm" class="flex gap-2 mb-2">
-            <input type="text" placeholder="Asset Name (e.g., Savings)" class="w-2/3 border rounded-lg p-2" required>
-            <input type="number" step="0.01" min="0" placeholder="Amount" class="w-1/3 border rounded-lg p-2" required>
-            <button class="bg-green-500 text-white rounded-lg p-2 hover:bg-green-600">Add</button>
+        <h2 class="text-lg font-semibold mb-2">📊 Spending vs Savings</h2>
+        <div class="w-full bg-gray-200 rounded-full h-4">
+            <div id="progressBar" class="h-4 rounded-full transition-all duration-500" style="width: 100%"></div>
+        </div>
+    </div>
+
+    <div class="p-4 bg-white rounded-2xl shadow-md">
+        <label class="block text-center font-semibold text-lg mb-2">🤖 Smart Add Command</label>
+        <input id="smartAddInput" type="text" placeholder='Try: "spent 50 on groceries" or "paycheck 1500" or "save for vacation 2500"' class="w-full border rounded-lg p-2 mb-2 text-center">
+        <button onclick="smartAddLine()" class="w-full bg-indigo-500 text-white rounded-lg p-2 hover:bg-indigo-600 active:scale-95 transition-transform">Add from Text</button>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-6">
+        <div class="p-4 bg-white rounded-2xl shadow-md">
+            <h2 class="font-semibold text-lg mb-2">➕ Add Deposit</h2>
+            <form id="depositForm" class="space-y-2">
+                <input type="number" step="0.01" min="0" placeholder="Amount" class="w-full border rounded-lg p-2" required>
+                <input type="text" placeholder="Description (optional)" class="w-full border rounded-lg p-2">
+                <button class="w-full bg-green-500 text-white rounded-lg p-2 hover:bg-green-600 active:scale-95 transition-transform">Add Deposit</button>
+            </form>
+        </div>
+
+        <div class="p-4 bg-white rounded-2xl shadow-md">
+            <h2 class="font-semibold text-lg mb-2">💸 Add Expense</h2>
+            <form id="expenseForm" class="space-y-2">
+                <input id="expenseDesc" type="text" placeholder="Description (e.g., Starbucks coffee)" class="w-full border rounded-lg p-2">
+                <div class="grid grid-cols-2 gap-2">
+                    <input id="expenseCategory" list="category-suggestions" type="text" placeholder="Category" class="w-full border rounded-lg p-2">
+                    <datalist id="category-suggestions"></datalist>
+                    <input id="expenseAmount" type="number" step="0.01" min="0" placeholder="Amount" class="w-full border rounded-lg p-2" required>
+                </div>
+                <label class="flex items-center space-x-2">
+                    <input type="checkbox" id="recurringExpense" class="h-4 w-4">
+                    <span>Make this a recurring monthly expense</span>
+                </label>
+                <button class="w-full bg-red-500 text-white rounded-lg p-2 hover:bg-red-600 active:scale-95 transition-transform">Add Expense</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="p-4 bg-white rounded-2xl shadow-md flex flex-wrap gap-3 justify-center">
+        <select id="sortSelect" class="border rounded-lg p-2">
+            <option value="newest">Sort by: Newest</option>
+            <option value="oldest">Oldest</option>
+            <option value="amount">Amount</option>
+        </select>
+        <input id="filterCategory" type="text" placeholder="Filter by category..." class="border rounded-lg p-2">
+        <button onclick="updateUI()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 active:scale-95 transition-transform">Apply</button>
+    </div>
+
+    <div class="p-4 bg-white rounded-2xl shadow-md">
+        <h2 class="font-semibold text-lg mb-2">📜 All Transactions</h2>
+        <ul id="transactionList" class="space-y-1 text-gray-800"></ul>
+        <div id="transactionTotals" class="mt-4 pt-2 border-t border-gray-200 flex justify-between font-bold"></div>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-6">
+        <div class="p-4 bg-white rounded-2xl shadow-md">
+            <h2 class="font-semibold text-lg mb-2">📈 Deposits</h2>
+            <ul id="depositList" class="space-y-1 text-green-600"></ul>
+        </div>
+        <div class="p-4 bg-white rounded-2xl shadow-md">
+            <h2 class="font-semibold text-lg mb-2">💸 Expenses</h2>
+            <ul id="expenseList" class="space-y-1 text-red-600"></ul>
+        </div>
+    </div>
+
+    <div class="p-4 bg-white rounded-2xl shadow-md">
+        <h2 class="font-semibold text-lg mb-2">🤖 Smart Insights</h2>
+        <div id="assistantInsights" class="space-y-2 text-gray-800">
+            <p class="text-sm text-gray-500">Insights will appear as you add data.</p>
+        </div>
+    </div>
+
+    <div class="p-4 bg-white rounded-2xl shadow-md">
+        <h2 class="font-semibold text-lg mb-2">🔁 Recurring Monthly Expenses</h2>
+        <ul id="recurringList" class="space-y-1 text-purple-600"></ul>
+    </div>
+
+    <div class="p-4 bg-white rounded-2xl shadow-md">
+        <h2 class="font-semibold text-lg mb-2">📊 Monthly Budgets</h2>
+        <form id="budgetForm" class="flex gap-2 mb-4">
+            <input list="category-suggestions" type="text" placeholder="Category" class="w-1/2 border rounded-lg p-2" required>
+            <input type="number" step="0.01" min="0" placeholder="Budget Amount" class="w-1/2 border rounded-lg p-2" required>
+            <button class="bg-blue-500 text-white rounded-lg p-2 hover:bg-blue-600 active:scale-95 transition-transform">Set</button>
         </form>
-        <ul id="assetList" class="space-y-1 text-green-700"></ul>
+        <ul id="budgetList" class="space-y-3"></ul>
+    </div>
+
+    <div class="p-4 bg-white rounded-2xl shadow-md">
+        <h2 class="font-semibold text-lg mb-2">🧮 Totals by Category</h2>
+        <ul id="categoryTotals" class="space-y-1"></ul>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-6">
+        <div class="p-4 bg-white rounded-2xl shadow-md">
+            <h2 class="text-lg font-semibold mb-2">💎 Net Worth Trend</h2>
+            <canvas id="netWorthChart" height="150"></canvas>
+            <button onclick="logNetWorth()" class="w-full mt-2 bg-indigo-500 text-white rounded-lg p-2 hover:bg-indigo-600 active:scale-95 transition-transform">Log Current Net Worth</button>
+        </div>
+        <div class="p-4 bg-white rounded-2xl shadow-md">
+            <h2 class="text-lg font-semibold mb-2">📊 Expenses by Category</h2>
+            <canvas id="expenseChart" height="150"></canvas>
+        </div>
     </div>
     <div class="p-4 bg-white rounded-2xl shadow-md">
-        <h2 class="font-semibold text-lg mb-2">🔴 Liabilities</h2>
-        <form id="liabilityForm" class="flex gap-2 mb-2">
-            <input type="text" placeholder="Liability Name (e.g., Loan)" class="w-2/3 border rounded-lg p-2" required>
-            <input type="number" step="0.01" min="0" placeholder="Amount" class="w-1/3 border rounded-lg p-2" required>
-            <button class="bg-red-500 text-white rounded-lg p-2 hover:bg-red-600">Add</button>
+        <h2 class="text-lg font-semibold mb-2">📅 Monthly Spending Trend</h2>
+        <canvas id="monthlyChart" height="150"></canvas>
+    </div>
+
+    <div class="p-4 bg-white rounded-2xl shadow-md">
+        <h2 class="text-lg font-semibold mb-2">📝 My Notes</h2>
+        <p class="text-sm text-gray-500 mb-2">A simple scratchpad for your financial thoughts or to-do items.</p>
+        <textarea id="notesTextarea" class="w-full border rounded-lg p-2 h-32" placeholder="e.g., 'Need to check bank statement for refund...'"></textarea>
+        <button id="saveNotesBtn" class="w-full mt-2 bg-blue-500 text-white rounded-lg p-2 hover:bg-blue-600 active:scale-95 transition-transform">Save Notes</button>
+    </div>
+
+    <div class="p-4 bg-white rounded-2xl shadow-md">
+        <h2 class="font-semibold text-lg mb-2">🎯 Smart Financial Goals</h2>
+        <form id="goalForm" class="space-y-2 mb-4">
+            <input id="goalNameInput" type="text" placeholder="Goal Name (e.g., Laptop, Pay off Debt)" class="w-full border rounded-lg p-2" required>
+            <div class="flex gap-2">
+                <input id="goalTargetInput" type="number" step="0.01" min="1" placeholder="Target Amount" class="w-2/3 border rounded-lg p-2" required>
+                <select id="goalTypeSelect" class="w-1/3 border rounded-lg p-2">
+                    <option value="asset">Asset (Savings)</option>
+                    <option value="liability">Liability (Debt)</option>
+                </select>
+            </div>
+            <button class="w-full bg-blue-500 text-white rounded-lg p-2 hover:bg-blue-600 active:scale-95 transition-transform">Add Goal</button>
         </form>
-        <ul id="liabilityList" class="space-y-1 text-red-700"></ul>
+
+        <div id="goalsContainer" class="space-y-4">
+            </div>
     </div>
-</div>
 
-<div class="p-4 bg-white rounded-2xl shadow-md text-center space-x-2">
-<h2 class="font-semibold text-lg mb-2">⚡ Quick Add Expense</h2>
-<button onclick="quickAdd('Coffee', 5, 'Starbucks coffee')" class="bg-orange-400 text-white px-3 py-1 rounded hover:bg-orange-500">☕ Coffee - $5</button>
-<button onclick="quickAdd('Lunch', 12, 'Lunch combo')" class="bg-orange-400 text-white px-3 py-1 rounded hover:bg-orange-500">🍔 Lunch - $12</button>
-<button onclick="quickAdd('Transport', 10, 'Bus fare')" class="bg-orange-400 text-white px-3 py-1 rounded hover:bg-orange-500">🚌 Transport - $10</button>
+    <div class="p-6 bg-white rounded-2xl shadow-md text-gray-800">
+        <h2 class="text-xl font-semibold mb-4 text-center">🌱 7 Stages to Financial Freedom</h2>
+<div class="space-y-4 text-sm">
+<div>
+<h3 class="font-bold">1️⃣ Build a Baseline</h3>
+<p class="ml-5">💰 Track every dollar — no guilt, just awareness.</p>
+<p class="ml-5">📊 Create a simple budget where your income > expenses.</p>
+<p class="ml-5">👉 That gap? It’s your Freedom Fund.</p>
 </div>
-
-<div class="p-4 bg-white rounded-2xl shadow-md">
-<h2 class="text-lg font-semibold mb-2">📊 Spending vs Savings</h2>
-<div class="w-full bg-gray-200 rounded-full h-4">
-<div id="progressBar" class="h-4 rounded-full transition-all duration-500" style="width: 100%"></div>
+<div>
+<h3 class="font-bold">2️⃣ Get Out of the Danger Zone</h3>
+<p class="ml-5">🔥 Pay off high-interest debt (especially credit cards).</p>
+<p class="ml-5">🛡️ Build an emergency fund: 3–6 months of living costs.</p>
+<p class="ml-5">💪 This gives you stability and peace of mind.</p>
 </div>
+<div>
+<h3 class="font-bold">3️⃣ Stabilize and Automate</h3>
+<p class="ml-5">⚙️ Automate savings + investments so you don’t rely on willpower.</p>
+<p class="ml-5">🚫 Don’t inflate your lifestyle when your income grows.</p>
+<p class="ml-5">📈 Keep your money working even when you’re not.</p>
 </div>
-
-<div class="p-4 bg-white rounded-2xl shadow-md">
-    <label class="block text-center font-semibold text-lg mb-2">🤖 Smart Add Command</label>
-    <input id="smartAddInput" type="text" placeholder='Try: "spent 50 on groceries" or "paycheck 1500" or "save for vacation 2500"' class="w-full border rounded-lg p-2 mb-2 text-center">
-    <button onclick="smartAddLine()" class="w-full bg-indigo-500 text-white rounded-lg p-2 hover:bg-indigo-600">Add from Text</button>
+<div>
+<h3 class="font-bold">4️⃣ Invest Intentionally</h3>
+<p class="ml-5">💼 Focus on assets that grow — index funds, ETFs, diversified portfolios.</p>
+<p class="ml-5">🐢 Compounding takes time, but it always wins over hype.</p>
+<p class="ml-5">🤓 Invest in understanding what you own.</p>
 </div>
-
-
-<div class="grid md:grid-cols-2 gap-6">
-<div class="p-4 bg-white rounded-2xl shadow-md">
-<h2 class="font-semibold text-lg mb-2">➕ Add Deposit</h2>
-<form id="depositForm" class="space-y-2">
-<input type="number" step="0.01" min="0" placeholder="Amount" class="w-full border rounded-lg p-2" required>
-<input type="text" placeholder="Description (optional)" class="w-full border rounded-lg p-2">
-<button class="w-full bg-green-500 text-white rounded-lg p-2 hover:bg-green-600">Add Deposit</button>
-</form>
+<div>
+<h3 class="font-bold">5️⃣ Create Multiple Income Streams</h3>
+<p class="ml-5">🧠 Learn skills that raise your earning ceiling (coding, finance, marketing…).</p>
+<p class="ml-5">💻 Build side income — freelance, digital products, or smart investments.</p>
+<p class="ml-5">🌊 Each new stream adds another layer of freedom.</p>
 </div>
-
-<div class="p-4 bg-white rounded-2xl shadow-md">
-<h2 class="font-semibold text-lg mb-2">💸 Add Expense</h2>
-<form id="expenseForm" class="space-y-2">
-<input id="expenseDesc" type="text" placeholder="Description (e.g., Starbucks coffee)" class="w-full border rounded-lg p-2">
-<div class="grid grid-cols-2 gap-2">
-    <input id="expenseCategory" list="category-suggestions" type="text" placeholder="Category" class="w-full border rounded-lg p-2">
-    <datalist id="category-suggestions"></datalist>
-    <input id="expenseAmount" type="number" step="0.01" min="0" placeholder="Amount" class="w-full border rounded-lg p-2" required>
+<div>
+<h3 class="font-bold">6️⃣ Protect and Plan</h3>
+<p class="ml-5">🏠 Get insurance that protects your income and assets.</p>
+<p class="ml-5">📜 Learn basic tax strategy — keep more of what you earn.</p>
+<p class="ml-5">🌴 Think long term: retirement, real estate, or passive income plays.</p>
 </div>
-<label class="flex items-center space-x-2">
-<input type="checkbox" id="recurringExpense" class="h-4 w-4">
-<span>Make this a recurring monthly expense</span>
-</label>
-<button class="w-full bg-red-500 text-white rounded-lg p-2 hover:bg-red-600">Add Expense</button>
-</form>
+<div>
+<h3 class="font-bold">7️⃣ The Freedom Zone</h3>
+<p class="ml-5">🌞 Your assets pay your bills.</p>
+<p class="ml-5">💼 Work becomes optional, not required.</p>
+<p class="ml-5">💬 You buy time, not stuff.</p>
+</div>
 </div>
 </div>
 
-<div class="p-4 bg-white rounded-2xl shadow-md flex flex-wrap gap-3 justify-center">
-<select id="sortSelect" class="border rounded-lg p-2">
-<option value="newest">Sort by: Newest</option>
-<option value="oldest">Oldest</option>
-<option value="amount">Amount</option>
-</select>
-<input id="filterCategory" type="text" placeholder="Filter by category..." class="border rounded-lg p-2">
-<button onclick="updateUI()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Apply</button>
-</div>
 
-<div class="p-4 bg-white rounded-2xl shadow-md">
-    <h2 class="font-semibold text-lg mb-2">📜 All Transactions</h2>
-    <ul id="transactionList" class="space-y-1 text-gray-800"></ul>
-    <div id="transactionTotals" class="mt-4 pt-2 border-t border-gray-200 flex justify-between font-bold">
-        </div>
-</div>
-
-
-<div class="grid md:grid-cols-2 gap-6">
-<div class="p-4 bg-white rounded-2xl shadow-md">
-<h2 class="font-semibold text-lg mb-2">📈 Deposits</h2>
-<ul id="depositList" class="space-y-1 text-green-600"></ul>
-</div>
-<div class="p-4 bg-white rounded-2xl shadow-md">
-<h2 class="font-semibold text-lg mb-2">💸 Expenses</h2>
-<ul id="expenseList" class="space-y-1 text-red-600"></ul>
-</div>
-</div>
-<div class="p-4 bg-white rounded-2xl shadow-md">
-<h2 class="font-semibold text-lg mb-2">🤖 Smart Insights</h2>
-<div id="assistantInsights" class="space-y-2 text-gray-800">
-<p class="text-sm text-gray-500">Insights will appear as you add data.</p>
-</div>
-</div>
-
-<div class="p-4 bg-white rounded-2xl shadow-md">
-<h2 class="font-semibold text-lg mb-2">🔁 Recurring Monthly Expenses</h2>
-<ul id="recurringList" class="space-y-1 text-purple-600"></ul>
-</div>
-
-<div class="p-4 bg-white rounded-2xl shadow-md">
-<h2 class="font-semibold text-lg mb-2">🧮 Totals by Category</h2>
-<ul id="categoryTotals" class="space-y-1"></ul>
-</div>
-
-<div class="grid md:grid-cols-2 gap-6">
-    <div class="p-4 bg-white rounded-2xl shadow-md">
-        <h2 class="text-lg font-semibold mb-2">💎 Net Worth Trend</h2>
-        <canvas id="netWorthChart" height="150"></canvas>
-        <button onclick="logNetWorth()" class="w-full mt-2 bg-indigo-500 text-white rounded-lg p-2 hover:bg-indigo-600">Log Current Net Worth</button>
+    <div class="text-center flex flex-wrap justify-center gap-4">
+        <button id="resetBtn" class="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500 active:scale-95 transition-transform">♻️ Reset All Data</button>
+        <a href="blog.html" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 active:scale-95 transition-transform">✍️ Blog Post</a>
+        <a href="https://www.instagram.com/codecashflow05?igsh=amdwanBxZ2lwNWhq&utm_source=qr" target="_blank" class="bg-pink-500 text-white px-4 py-2 rounded-lg hover:bg-pink-600 btn-click-effect active:scale-95 transition-transform">📸 Connect on Insta</a>
+        <button id="exportBtn" class="bg-blue-400 text-white px-4 py-2 rounded-lg hover:bg-blue-500 active:scale-95 transition-transform">📤 Export</button>
+        <input type="file" id="importFile" class="hidden" accept="application/json, text/csv, .csv">
+        <label for="importFile" class="bg-blue-500 text-white px-4 py-2 rounded-lg cursor-pointer hover:bg-blue-600 active:scale-95 transition-transform">📥 Import</label>
+        <a href="https://buymeacoffee.com/sibtainsalw" target="_blank" class="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 active:scale-95 transition-transform">☕ Buy me Coffee!</a>
     </div>
-    <div class="p-4 bg-white rounded-2xl shadow-md">
-        <h2 class="text-lg font-semibold mb-2">📊 Expenses by Category</h2>
-        <canvas id="expenseChart" height="150"></canvas>
-    </div>
-</div>
-<div class="p-4 bg-white rounded-2xl shadow-md">
-<h2 class="text-lg font-semibold mb-2">📅 Monthly Spending Trend</h2>
-<canvas id="monthlyChart" height="150"></canvas>
-</div>
-
-
-<div class="p-4 bg-white rounded-2xl shadow-md">
-<h2 class="font-semibold text-lg mb-2">🎯 Savings Goal</h2>
-<form id="goalForm" class="space-y-2 mb-4">
-<input type="text" placeholder="Goal Name (e.g., Laptop)" class="w-full border rounded-lg p-2" required>
-<input type="number" step="0.01" min="1" placeholder="Goal Amount" class="w-full border rounded-lg p-2" required>
-<button class="w-full bg-blue-500 text-white rounded-lg p-2 hover:bg-blue-600">Set Goal</button>
-</form>
-
-<div id="goalArea" class="hidden">
-<p class="font-semibold">Goal: <span id="goalName"></span> - $<span id="goalAmount"></span></p>
-<div class="w-full bg-gray-200 rounded-full h-4 mt-2">
-<div id="goalProgress" class="bg-blue-500 h-4 rounded-full transition-all duration-500" style="width: 0%"></div>
-</div>
-<p class="text-sm mt-1">Progress: <span id="goalPercent">0</span>%</p>
-<p id="goalStatus" class="text-green-600 font-semibold mt-2 hidden">🎉 Goal Reached!</p>
-</div>
-</div>
-
-<div class="p-6 bg-white rounded-2xl shadow-md text-gray-800">
-    <h2 class="text-xl font-semibold mb-4 text-center">🌱 7 Stages to Financial Freedom</h2>
-    <div class="space-y-4 text-sm">
-        <div>
-            <h3 class="font-bold">1️⃣ Build a Baseline</h3>
-            <p class="ml-5">💰 Track every dollar — no guilt, just awareness.</p>
-            <p class="ml-5">📊 Create a simple budget where your income > expenses.</p>
-            <p class="ml-5">👉 That gap? It’s your Freedom Fund.</p>
-        </div>
-        <div>
-            <h3 class="font-bold">2️⃣ Get Out of the Danger Zone</h3>
-            <p class="ml-5">🔥 Pay off high-interest debt (especially credit cards).</p>
-            <p class="ml-5">🛡️ Build an emergency fund: 3–6 months of living costs.</p>
-            <p class="ml-5">💪 This gives you stability and peace of mind.</p>
-        </div>
-        <div>
-            <h3 class="font-bold">3️⃣ Stabilize and Automate</h3>
-            <p class="ml-5">⚙️ Automate savings + investments so you don’t rely on willpower.</p>
-            <p class="ml-5">🚫 Don’t inflate your lifestyle when your income grows.</p>
-            <p class="ml-5">📈 Keep your money working even when you’re not.</p>
-        </div>
-        <div>
-            <h3 class="font-bold">4️⃣ Invest Intentionally</h3>
-            <p class="ml-5">💼 Focus on assets that grow — index funds, ETFs, diversified portfolios.</p>
-            <p class="ml-5">🐢 Compounding takes time, but it always wins over hype.</p>
-            <p class="ml-5">🤓 Invest in understanding what you own.</p>
-        </div>
-        <div>
-            <h3 class="font-bold">5️⃣ Create Multiple Income Streams</h3>
-            <p class="ml-5">🧠 Learn skills that raise your earning ceiling (coding, finance, marketing…).</p>
-            <p class="ml-5">💻 Build side income — freelance, digital products, or smart investments.</p>
-            <p class="ml-5">🌊 Each new stream adds another layer of freedom.</p>
-        </div>
-        <div>
-            <h3 class="font-bold">6️⃣ Protect and Plan</h3>
-            <p class="ml-5">🏠 Get insurance that protects your income and assets.</p>
-            <p class="ml-5">📜 Learn basic tax strategy — keep more of what you earn.</p>
-            <p class="ml-5">🌴 Think long term: retirement, real estate, or passive income plays.</p>
-        </div>
-        <div>
-            <h3 class="font-bold">7️⃣ The Freedom Zone</h3>
-            <p class="ml-5">🌞 Your assets pay your bills.</p>
-            <p class="ml-5">💼 Work becomes optional, not required.</p>
-            <p class="ml-5">💬 You buy time, not stuff.</p>
-        </div>
-    </div>
-</div>
-
-
-<div class="text-center space-x-4">
-<button id="resetBtn" class="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500">♻️ Reset All Data</button>
-<a href="https://www.instagram.com/codecashflow05?igsh=amdwanBxZ2lwNWhq&utm_source=qr" target="_blank" class="bg-pink-500 text-white px-4 py-2 rounded-lg hover:bg-pink-600 btn-click-effect">📸 Connect on Insta</a>
-<button id="exportBtn" class="bg-blue-400 text-white px-4 py-2 rounded-lg hover:bg-blue-500">📤 Export</button>
-<input type="file" id="importFile" class="hidden" accept="application/json">
-<label for="importFile" class="bg-blue-500 text-white px-4 py-2 rounded-lg cursor-pointer hover:bg-blue-600">📥 Import</label>
-<a href="https://buymeacoffee.com/sibtainsalw" target="_blank" class="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600">☕ Buy me Coffee!</a>
-</div>
 </div>
 
 <script>
-// ===== STATE (with safe upgrade) =====
-let state = JSON.parse(localStorage.getItem("financeData")) || {
-    balance: 0,
-    deposits: [],
-    expenses: [],
-    recurring: [],
-    goal: { name: "", amount: 0 },
-    assets: [],
-    liabilities: [],
-    netWorthHistory: [],
-    lastAppliedMonth: null,
-    lastBackupMonth: null
-};
-// normalize legacy records
-state.deposits = (state.deposits || []).map(d => ({ amount: d.amount, date: d.date || todayISO(), description: d.description || "" }));
-state.expenses = (state.expenses || []).map(e => ({ category: e.category || "", amount: e.amount, date: e.date || todayISO(), description: e.description || "" }));
-if (!state.recurring) state.recurring = [];
-if (!state.assets) state.assets = [];
-if (!state.liabilities) state.liabilities = [];
-if (!state.netWorthHistory) state.netWorthHistory = [];
-if (!state.lastAppliedMonth) state.lastAppliedMonth = null;
-if (!state.lastBackupMonth) state.lastBackupMonth = null;
+// ===== ROBUST STATE INITIALIZATION (SELF-HEALING) =====
+let state;
+try {
+    const rawState = localStorage.getItem("financeData");
+    state = rawState ? JSON.parse(rawState) : null;
+   
+    // Safety Checks & Migration
+    if (!state || typeof state !== 'object') throw new Error("Invalid state");
+    if (!Array.isArray(state.deposits)) state.deposits = [];
+    if (!Array.isArray(state.expenses)) state.expenses = [];
+    if (!Array.isArray(state.recurring)) state.recurring = [];
+    if (!Array.isArray(state.assets)) state.assets = [];
+    if (!Array.isArray(state.liabilities)) state.liabilities = [];
+    if (!Array.isArray(state.netWorthHistory)) state.netWorthHistory = [];
+    if (!state.budgets || typeof state.budgets !== 'object') state.budgets = {};
+    if (typeof state.balance !== 'number') state.balance = 0;
+    if (typeof state.notes !== 'string') state.notes = "";
+
+    // MIGRATION: Convert old single goal to new goals array
+    if (!Array.isArray(state.goals)) {
+        state.goals = [];
+        if (state.goal && state.goal.amount > 0) {
+            state.goals.push({
+                name: state.goal.name,
+                amount: state.goal.amount,
+                saved: state.goal.saved || 0,
+                type: state.goal.type || 'asset'
+            });
+        }
+        delete state.goal; // Remove old structure
+    }
+
+} catch (e) {
+    console.warn("Corrupt data detected. Resetting state.", e);
+    state = {
+        balance: 0, deposits: [], expenses: [], recurring: [],
+        goals: [], // NEW: Array for multiple goals
+        assets: [], liabilities: [], netWorthHistory: [],
+        lastAppliedMonth: null, lastBackupMonth: null,
+        notes: "", budgets: {}
+    };
+}
 
 // ===== ELEMENTS =====
 const balanceEl = document.getElementById("balance");
@@ -270,566 +306,356 @@ const transactionTotals = document.getElementById("transactionTotals");
 const recurringList = document.getElementById("recurringList");
 const categoryTotals = document.getElementById("categoryTotals");
 const assistantInsights = document.getElementById("assistantInsights");
-// Net Worth Elements
+// Net Worth
 const netWorthEl = document.getElementById("netWorth");
 const assetList = document.getElementById("assetList");
 const liabilityList = document.getElementById("liabilityList");
-// Chart Elements
+// Charts
 const expenseChartCtx = document.getElementById("expenseChart").getContext("2d");
 const monthlyChartCtx = document.getElementById("monthlyChart").getContext("2d");
 const netWorthChartCtx = document.getElementById("netWorthChart").getContext("2d");
 // Goal Elements
 const goalForm = document.getElementById("goalForm");
-const goalArea = document.getElementById("goalArea");
-const goalNameEl = document.getElementById("goalName");
-const goalAmountEl = document.getElementById("goalAmount");
-const goalProgress = document.getElementById("goalProgress");
-const goalPercentEl = document.getElementById("goalPercent");
-const goalStatus = document.getElementById("goalStatus");
+const goalsContainer = document.getElementById("goalsContainer");
+const goalNameInput = document.getElementById("goalNameInput");
+const goalTypeSelect = document.getElementById("goalTypeSelect");
+// Notes & Budget
+const notesTextarea = document.getElementById("notesTextarea");
+const saveNotesBtn = document.getElementById("saveNotesBtn");
+const budgetForm = document.getElementById("budgetForm");
+const budgetList = document.getElementById("budgetList");
 
-// ===== LOGIC FLAGS =====
+// ===== LOGIC FLAGS & HELPERS =====
 let categoryManuallyEdited = false;
+function todayISO() { return new Date().toISOString().slice(0,10); }
+function monthKey(d) { return d.slice(0,7); }
+function escapeHtml(s) { return String(s).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])); }
 
-// ===== CHARTS =====
-const expenseChart = new Chart(expenseChartCtx, {
-    type: 'pie',
-    data: { labels: [], datasets: [{ data: [], backgroundColor: [] }] },
-    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
-});
+// ===== CHARTS CONFIG =====
+const expenseChart = new Chart(expenseChartCtx, { type: 'pie', data: { labels: [], datasets: [{ data: [], backgroundColor: [] }] }, options: { responsive: true, plugins: { legend: { position: 'bottom' } } } });
+const monthlyChart = new Chart(monthlyChartCtx, { type: 'bar', data: { labels: [], datasets: [{ label: 'Deposits', data: [], backgroundColor: 'rgba(75,192,192,0.6)' }, { label: 'Expenses', data: [], backgroundColor: 'rgba(255,99,132,0.6)' }] }, options: { responsive: true, scales: { y: { beginAtZero: true } } } });
+const netWorthChart = new Chart(netWorthChartCtx, { type: 'line', data: { labels: [], datasets: [{ label: 'Net Worth', data: [], borderColor: 'rgba(75, 192, 192, 1)', backgroundColor: 'rgba(75, 192, 192, 0.2)', fill: true, tension: 0.1 }] }, options: { responsive: true, scales: { y: { beginAtZero: true } } } });
 
-const monthlyChart = new Chart(monthlyChartCtx, {
-    type: 'bar',
-    data: { labels: [], datasets: [
-        { label: 'Deposits', data: [], backgroundColor: 'rgba(75,192,192,0.6)' },
-        { label: 'Expenses', data: [], backgroundColor: 'rgba(255,99,132,0.6)' }
-    ]},
-    options: { responsive: true, scales: { y: { beginAtZero: true } } }
-});
-
-const netWorthChart = new Chart(netWorthChartCtx, {
-    type: 'line',
-    data: { labels: [], datasets: [{ 
-        label: 'Net Worth', 
-        data: [], 
-        borderColor: 'rgba(75, 192, 192, 1)',
-        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-        fill: true,
-        tension: 0.1 
-    }] },
-    options: { responsive: true, scales: { y: { beginAtZero: true } } }
-});
-
-// ===== HELPERS =====
+// ===== CORE FUNCTIONS =====
 function save() {
-    const currentMonth = currentMonthKey();
-    if (state.lastBackupMonth !== currentMonth) {
-        console.log(`Performing monthly backup for ${currentMonth}...`);
-        const blob = new Blob([JSON.stringify(state)], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `financeData_backup_${currentMonth}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
-        state.lastBackupMonth = currentMonth;
-    }
     localStorage.setItem("financeData", JSON.stringify(state));
 }
 
-function monthKey(dstr) {
-    if (/^\d{4}-\d{2}-\d{2}$/.test(dstr)) return dstr.slice(0,7);
-    const d = new Date(dstr);
-    if (!isNaN(d)) return d.toISOString().slice(0,7);
-    return new Date().toISOString().slice(0,7);
+function animateValue(obj, start, end, duration) {
+    let startTimestamp = null;
+    const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        obj.innerHTML = `$${(progress * (end - start) + start).toFixed(2)}`;
+        if (progress < 1) window.requestAnimationFrame(step);
+        else obj.innerHTML = `$${end.toFixed(2)}`;
+    };
+    window.requestAnimationFrame(step);
 }
-function currentMonthKey() { return new Date().toISOString().slice(0,7); }
-function todayISO() { return new Date().toISOString().slice(0,10); }
 
-// ===== NEW SMART ADD PARSER =====
-const EXPENSE_KEYS = ['spent', 'paid', 'bought', 'buy', 'charge', 'cost', 'bill', 'purchase', 'exp', 'for', 'on', 'at'];
-const DEPOSIT_KEYS = ['deposit', 'got', 'received', 'add', 'income', 'paycheck', 'salary', 'bonus', 'earned'];
-const GOAL_KEYS = ['goal', 'save for', 'saving for', 'set goal', 'target', 'wishlist'];
-
-function parseSmartAdd(userInput) {
-    let originalInput = userInput;
-    userInput = userInput.toLowerCase().trim();
-
-    // 1. Find the Amount (handles $50, 50, 120.50)
-    const amountMatch = userInput.match(/\$?(\d+\.?\d*)/);
-    if (!amountMatch) return { error: "Could not find an amount." };
-    
-    const amount = parseFloat(amountMatch[1]);
-    userInput = userInput.replace(amountMatch[0], ''); // Remove the amount for easier parsing
-
-    // 2. Determine the Intent
-    let intent = 'expense'; // Default to expense
-    if (GOAL_KEYS.some(key => userInput.includes(key))) {
-        intent = 'goal';
-    } else if (DEPOSIT_KEYS.some(key => userInput.includes(key)) || originalInput.startsWith('+')) {
-        intent = 'deposit';
+function normalizeDate(dateStr) {
+    if (!dateStr) return todayISO();
+    dateStr = dateStr.trim();
+    if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(dateStr)) {
+        const [m, d, y] = dateStr.split('/');
+        return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
     }
+    return dateStr.includes('-') ? dateStr : todayISO();
+}
 
-    // 3. Extract the Date
-    let date = todayISO();
-    if (userInput.includes('yesterday')) {
-        const d = new Date();
-        d.setDate(d.getDate() - 1);
-        date = d.toISOString().slice(0, 10);
-        userInput = userInput.replace('yesterday', '');
-    } else if (userInput.includes('today')) {
-        userInput = userInput.replace('today', '');
-    }
+function calculateNetWorth() {
+    const totalAssets = state.assets.reduce((sum, a) => sum + a.amount, 0);
+    const totalLiabilities = state.liabilities.reduce((sum, l) => sum + l.amount, 0);
+    let nw = totalAssets + state.balance - totalLiabilities;
+    // Sum up saved amount from ALL asset goals
+    const totalAssetSavings = state.goals
+        .filter(g => g.type === 'asset')
+        .reduce((sum, g) => sum + g.saved, 0);
+    nw += totalAssetSavings;
+    return nw;
+}
 
-    // 4. Clean up the Description
-    const allKeys = [...EXPENSE_KEYS, ...DEPOSIT_KEYS, ...GOAL_KEYS];
-    let description = userInput;
-    allKeys.forEach(key => {
-        description = description.replace(new RegExp(`\\b${key}\\b`, 'g'), '');
+// ===== UI UPDATE LOOP =====
+function updateUI() {
+    // Net Worth & Balance
+    const nw = calculateNetWorth();
+    const currNw = parseFloat(netWorthEl.textContent.replace('$','')) || 0;
+    if(currNw !== nw) animateValue(netWorthEl, currNw, nw, 500); else if(netWorthEl.textContent==="$0.00") netWorthEl.textContent = `$${nw.toFixed(2)}`;
+
+    const currBal = parseFloat(balanceEl.textContent.replace('$','')) || 0;
+    if(currBal !== state.balance) animateValue(balanceEl, currBal, state.balance, 500); else if(balanceEl.textContent==="$0.00") balanceEl.textContent = `$${state.balance.toFixed(2)}`;
+    balanceCard.className = "p-6 bg-white rounded-2xl shadow-md text-center transition " + (state.balance > 100 ? "bg-green-100" : (state.balance >= 0 ? "bg-yellow-100" : "bg-red-100"));
+
+    // Lists
+    assetList.innerHTML = state.assets.map((a,i)=>`<li>- ${escapeHtml(a.name)}: $${a.amount.toFixed(2)} <button onclick="deleteAsset(${i})" class="text-xs text-red-500 ml-2">❌</button></li>`).join("");
+    liabilityList.innerHTML = state.liabilities.map((l,i)=>`<li>- ${escapeHtml(l.name)}: $${l.amount.toFixed(2)} <button onclick="deleteLiability(${i})" class="text-xs text-red-500 ml-2">❌</button></li>`).join("");
+    recurringList.innerHTML = state.recurring.map((r,i)=>`<li>🔁 ${escapeHtml(r.category)}: -$${r.amount.toFixed(2)} <button onclick="deleteRecurring(${i})" class="text-xs text-red-500 ml-2">❌</button></li>`).join("");
+
+    // Transactions
+    const all = [...state.deposits.map(d=>({...d, type:'deposit'})), ...state.expenses.map(e=>({...e, type:'expense'}))].sort((a,b)=>new Date(b.date)-new Date(a.date));
+    transactionList.innerHTML = all.length ? all.map(t => {
+        if(t.type==='deposit') return `<li>(${t.date}) ${escapeHtml(t.description)} <span class="font-bold text-green-600 float-right">+$${t.amount.toFixed(2)}</span></li>`;
+        return `<li>(${t.date}) ${escapeHtml(t.category)}: ${escapeHtml(t.description)} <span class="font-bold text-red-600 float-right">-$${t.amount.toFixed(2)}</span></li>`;
+    }).join('') : '<li>No transactions.</li>';
+   
+    const totDep = state.deposits.reduce((s,d)=>s+d.amount,0);
+    const totExp = state.expenses.reduce((s,e)=>s+e.amount,0);
+    transactionTotals.innerHTML = `<span class="text-green-600">In: +$${totDep.toFixed(2)}</span><span class="text-red-600">Out: -$${totExp.toFixed(2)}</span>`;
+   
+    depositList.innerHTML = state.deposits.map((d,i)=>`<li>💰 +$${d.amount.toFixed(2)} (${d.date}) ${escapeHtml(d.description)} <button onclick="deleteDeposit(${i})" class="text-xs text-red-500">❌</button></li>`).join("");
+    expenseList.innerHTML = state.expenses.map((e,i)=>`<li>💸 ${escapeHtml(e.category)}: -$${e.amount.toFixed(2)} (${e.date}) ${escapeHtml(e.description)} <button onclick="deleteExpense(${i})" class="text-xs text-red-500">❌</button></li>`).join("");
+
+    // Charts
+    const catTotals = state.expenses.reduce((acc,e)=>{const c=e.category||"Misc"; acc[c]=(acc[c]||0)+e.amount; return acc;},{});
+    categoryTotals.innerHTML = Object.entries(catTotals).map(([c,a])=>`<li>${escapeHtml(c)}: $${a.toFixed(2)}</li>`).join("");
+   
+    expenseChart.data.labels = Object.keys(catTotals);
+    expenseChart.data.datasets[0].data = Object.values(catTotals);
+    expenseChart.data.datasets[0].backgroundColor = Object.keys(catTotals).map((_,i)=>`hsl(${i*50},70%,60%)`);
+    expenseChart.update();
+
+    const months = {};
+    all.forEach(t => {
+        const m = monthKey(t.date);
+        if(!months[m]) months[m]={dep:0, exp:0};
+        if(t.type==='deposit') months[m].dep+=t.amount; else months[m].exp+=t.amount;
     });
-    
-    description = description.replace(/\s+/g, ' ').trim().replace(/^[^\w]+|[^\w]+$/g, ""); // Remove extra spaces and leading/trailing symbols
+    const mLabels = Object.keys(months).sort();
+    monthlyChart.data.labels = mLabels;
+    monthlyChart.data.datasets[0].data = mLabels.map(m=>months[m].dep);
+    monthlyChart.data.datasets[1].data = mLabels.map(m=>months[m].exp);
+    monthlyChart.update();
 
-    return { intent, amount, description: description || "Smart Add", date };
+    netWorthChart.data.labels = state.netWorthHistory.map(h=>h.date);
+    netWorthChart.data.datasets[0].data = state.netWorthHistory.map(h=>h.amount);
+    netWorthChart.update();
+
+    // Progress Bar
+    const pct = totDep > 0 ? Math.max(0, ((totDep-totExp)/totDep)*100) : 100;
+    progressBar.style.width = pct + "%";
+    progressBar.className = "h-4 rounded-full transition-all duration-500 " + (pct>50?"bg-green-500":"bg-red-500");
+
+    updateGoalsUI();
+    updateBudgetUI(catTotals);
+    updateAssistant();
+    if(notesTextarea) notesTextarea.value = state.notes;
+    save();
 }
 
-function smartAddLine() {
-    const inputEl = document.getElementById('smartAddInput');
-    const command = inputEl.value.trim();
-    if (!command) return;
-
-    const result = parseSmartAdd(command);
-
-    if (result.error) {
-        alert(result.error);
+// ===== UPDATED MULTI-GOAL UI =====
+function updateGoalsUI() {
+    goalsContainer.innerHTML = "";
+    if (state.goals.length === 0) {
+        goalsContainer.innerHTML = "<p class='text-gray-500 text-sm text-center'>No active goals.</p>";
         return;
     }
 
-    switch (result.intent) {
-        case 'deposit':
-            state.balance += result.amount;
-            state.deposits.push({
-                amount: result.amount,
-                description: result.description,
-                date: result.date
-            });
-            break;
-        case 'goal':
-            state.goal = { name: result.description, amount: result.amount };
-            break;
-        case 'expense':
-        default:
-            const category = autoCategoryFromText(result.description);
-            state.balance -= result.amount;
-            state.expenses.push({
-                category: category,
-                amount: result.amount,
-                description: result.description,
-                date: result.date
-            });
-            break;
-    }
+    state.goals.forEach((goal, index) => {
+        const pct = Math.min(100, (goal.saved / goal.amount) * 100);
+        const typeLabel = goal.type === 'liability' ? 'Liability Payoff' : 'Asset Savings';
+        const typeClass = goal.type === 'liability' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800';
+        const isComplete = goal.saved >= goal.amount;
 
-    inputEl.value = '';
-    updateUI();
-}
-
-// ===== COMPREHENSIVE CATEGORY LIST =====
-const CATEGORY_RULES = [
-    // Housing & Home
-    { cat: "Housing", keys: ["rent", "mortgage", "property tax", "hoa"] },
-    { cat: "Utilities", keys: ["electric", "gas", "water", "sewage", "trash", "recycling", "utility", "internet", "wifi", "cable"] },
-    { cat: "Home Goods", keys: ["furniture", "decor", "appliances", "ikea", "wayfair", "lowes", "home depot", "ace hardware", "household supplies", "cleaning"] },
-    { cat: "Maintenance", keys: ["plumber", "electrician", "hvac", "repair", "landscaping", "pest control", "maintenance"] },
-    // Food & Dining
-    { cat: "Groceries", keys: ["groceries", "supermarket", "trader joes", "kroger", "whole foods", "farmers market", "costco", "sams club"] },
-    { cat: "Dining Out", keys: ["restaurant", "dining", "eats", "mcdonalds", "chipotle", "starbucks", "coffee", "cafe", "bar", "brewery", "delivery", "doordash", "uber eats", "grubhub"] },
-    // Transportation
-    { cat: "Auto & Gas", keys: ["gas", "fuel", "ev charging", "car payment", "auto loan", "car insurance", "oil change", "tires", "mechanic", "car wash", "dmv"] },
-    { cat: "Public Transit", keys: ["bus", "train", "subway", "metro", "lyft", "uber", "taxi", "scooter", "bike share", "parking", "toll"] },
-    // Health & Wellness
-    { cat: "Insurance", keys: ["health insurance", "dental insurance", "vision insurance", "life insurance", "disability insurance", "cobra", "premium"] },
-    { cat: "Medical", keys: ["doctor", "dentist", "vision", "optometrist", "hospital", "clinic", "urgent care", "copay", "pharmacy", "cvs", "walgreens", "prescription", "therapy", "counseling"] },
-    { cat: "Fitness", keys: ["gym", "fitness", "yoga", "classpass", "peloton", "workout", "protein"] },
-    // Personal & Shopping
-    { cat: "Personal Care", keys: ["haircut", "salon", "barber", "cosmetics", "skincare", "sephora", "ulta", "toiletries", "spa", "massage"] },
-    { cat: "Shopping", keys: ["clothing", "shoes", "accessories", "mall", "amazon", "walmart", "target", "best buy", "electronics", "fashion"] },
-    { cat: "Entertainment", keys: ["movies", "concert", "theater", "tickets", "sporting event", "netflix", "hulu", "disney+", "spotify", "streaming", "video games", "steam", "playstation", "xbox", "nintendo"] },
-    { cat: "Hobbies", keys: ["hobby", "crafts", "sports gear", "music lessons", "books", "audiobooks"] },
-    // Family & Pets
-    { cat: "Kids", keys: ["childcare", "daycare", "tuition", "school fees", "kids activities", "toys", "baby supplies", "diapers", "allowance"] },
-    { cat: "Pets", keys: ["pet food", "vet", "veterinarian", "grooming", "pet supplies", "pet insurance"] },
-    // Financial & Professional
-    { cat: "Gifts & Donations", keys: ["gift", "present", "birthday", "wedding", "charity", "donation", "tithe", "church"] },
-    { cat: "Financial", keys: ["bank fee", "atm fee", "late fee", "interest charge", "credit card payment", "student loan", "investment", "401k", "stock", "brokerage"] },
-    { cat: "Business", keys: ["business expense", "office supplies", "software", "client dinner", "work travel", "professional development"] },
-    { cat: "Taxes", keys: ["tax", "irs", "property tax", "tax preparation"] },
-    // Travel
-    { cat: "Travel", keys: ["flight", "airline", "hotel", "airbnb", "vacation", "trip", "tourism", "souvenir"] },
-    // Default Fallback
-    { cat: "Miscellaneous", keys: ["misc", "other", "uncategorized"] }
-];
-function autoCategoryFromText(text) {
-    if (!text) return "";
-    const t = text.toLowerCase();
-    for (const rule of CATEGORY_RULES) {
-        if (rule.keys.some(k => t.includes(k))) return rule.cat;
-    }
-    return "";
-}
-
-function populateCategoryDatalist() {
-    const datalist = document.getElementById('category-suggestions');
-    const categories = [...new Set(CATEGORY_RULES.map(rule => rule.cat))]; // Get unique categories
-    categories.sort();
-    datalist.innerHTML = categories.map(cat => `<option value="${cat}"></option>`).join('');
-}
-
-// ===== NET WORTH =====
-function calculateNetWorth() {
-    const totalAssets = state.assets.reduce((sum, asset) => sum + asset.amount, state.balance);
-    const totalLiabilities = state.liabilities.reduce((sum, liability) => sum + liability.amount, 0);
-    return totalAssets - totalLiabilities;
-}
-
-function logNetWorth() {
-    const today = todayISO();
-    const currentNetWorth = calculateNetWorth();
-    const lastLog = state.netWorthHistory[state.netWorthHistory.length - 1];
-    if (lastLog && lastLog.date === today) {
-        if(!confirm("You already logged your net worth today. Log again?")) return;
-    }
-    state.netWorthHistory.push({ date: today, amount: currentNetWorth });
-    state.netWorthHistory.sort((a,b) => new Date(a.date) - new Date(b.date));
-    updateUI();
-}
-
-// ===== RECURRING =====
-function applyRecurringExpenses() {
-    const currentMonth = currentMonthKey();
-    if (state.lastAppliedMonth === currentMonth) return;
-    state.recurring.forEach(r => {
-        state.balance -= r.amount;
-        state.expenses.push({ category: r.category + " (recurring)", amount: r.amount, date: todayISO(), description: r.description || "Recurring" });
+        const div = document.createElement('div');
+        div.className = "p-3 border rounded-lg bg-gray-50";
+        div.innerHTML = `
+            <div class="flex justify-between items-center mb-1">
+                <span class="font-bold text-gray-700">${escapeHtml(goal.name)} <span class="text-xs px-2 py-1 rounded ${typeClass}">${typeLabel}</span></span>
+                <span class="text-sm font-semibold">$${goal.saved.toFixed(2)} / $${goal.amount.toFixed(2)}</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-3 mb-1">
+                <div class="bg-blue-500 h-3 rounded-full transition-all" style="width: ${pct}%"></div>
+            </div>
+            <div class="flex justify-between items-center mt-2">
+                <span class="text-xs text-gray-500">${pct.toFixed(1)}%</span>
+                <div>
+                    ${!isComplete ? `<button onclick="contributeToGoal(${index})" class="bg-blue-500 text-white text-xs px-2 py-1 rounded hover:bg-blue-600 mr-2">➕ Add Funds</button>` : '<span class="text-green-600 font-bold text-xs mr-2">🎉 Done!</span>'}
+                    <button onclick="deleteGoal(${index})" class="text-red-500 text-xs">❌</button>
+                </div>
+            </div>
+        `;
+        goalsContainer.appendChild(div);
     });
-    state.lastAppliedMonth = currentMonth;
-    save();
 }
 
-function updateRecurringList() {
-    recurringList.innerHTML = state.recurring.length
-        ? state.recurring.map((r, i) => `<li>🔁 ${r.category}: -$${r.amount.toFixed(2)} / month <button onclick="deleteRecurring(${i})" class="text-xs text-red-500 ml-2">❌</button></li>`).join("")
-        : "<li>No recurring expenses yet.</li>";
-}
-function deleteRecurring(i){
-    state.recurring.splice(i,1);
-    save();
-    updateUI();
-}
-
-// ===== UI =====
-function updateUI() {
-    // NET WORTH SECTION
-    netWorthEl.textContent = `$${calculateNetWorth().toFixed(2)}`;
-    assetList.innerHTML = state.assets.map((a, i) => `<li>- ${escapeHtml(a.name)}: $${a.amount.toFixed(2)} <button onclick="deleteAsset(${i})" class="text-xs text-red-500 ml-2">❌</button></li>`).join("");
-    liabilityList.innerHTML = state.liabilities.map((l, i) => `<li>- ${escapeHtml(l.name)}: $${l.amount.toFixed(2)} <button onclick="deleteLiability(${i})" class="text-xs text-red-500 ml-2">❌</button></li>`).join("");
-    netWorthChart.data.labels = state.netWorthHistory.map(h => h.date);
-    netWorthChart.data.datasets[0].data = state.netWorthHistory.map(h => h.amount);
-    netWorthChart.update();
-    
-    // Sorting & filtering for display lists
-    const sortType = document.getElementById("sortSelect").value;
-    const filterText = (document.getElementById("filterCategory").value || "").toLowerCase();
-    let filteredExpenses = [...state.expenses].filter(e => filterText ? (e.category || "").toLowerCase().includes(filterText) : true);
-    if (sortType === "amount") filteredExpenses.sort((a,b) => b.amount - a.amount);
-    else if (sortType === "oldest") filteredExpenses.sort((a,b) => new Date(a.date) - new Date(b.date));
-    else filteredExpenses.sort((a,b) => new Date(b.date) - new Date(a.date));
-
-    // Balance + color
-    balanceEl.textContent = `$${state.balance.toFixed(2)}`;
-    balanceCard.className = "p-6 bg-white rounded-2xl shadow-md text-center transition ";
-    if (state.balance > 100) balanceCard.classList.add("bg-green-100");
-    else if (state.balance >= 0) balanceCard.classList.add("bg-yellow-100");
-    else balanceCard.classList.add("bg-red-100");
-
-    // COMBINED TRANSACTION LIST
-    const allTransactions = [
-        ...state.deposits.map(d => ({...d, type: 'deposit'})),
-        ...state.expenses.map(e => ({...e, type: 'expense'}))
-    ].sort((a, b) => new Date(b.date) - new Date(a.date));
-    
-    transactionList.innerHTML = allTransactions.length ? allTransactions.map(t => {
-        if (t.type === 'deposit') {
-            return `<li>(${t.date}) ${escapeHtml(t.description) || 'Deposit'} <span class="font-bold text-green-600 float-right">+$${t.amount.toFixed(2)}</span></li>`;
-        } else {
-            const desc = `${escapeHtml(t.category)}: ${escapeHtml(t.description)}`;
-            return `<li>(${t.date}) ${desc || 'Expense'} <span class="font-bold text-red-600 float-right">-$${t.amount.toFixed(2)}</span></li>`;
-        }
-    }).join('') : '<li>No transactions yet.</li>';
-
-    // Transaction Totals
-    const totalAllDeposits = state.deposits.reduce((sum, d) => sum + d.amount, 0);
-    const totalAllExpenses = state.expenses.reduce((sum, e) => sum + e.amount, 0);
-    transactionTotals.innerHTML = `
-        <span class="text-green-600">Total Deposits: +$${totalAllDeposits.toFixed(2)}</span>
-        <span class="text-red-600">Total Expenses: -$${totalAllExpenses.toFixed(2)}</span>
-    `;
-
-    // Deposit & Expense lists (separate)
-    depositList.innerHTML = state.deposits.map((d, i) => `<li>💰 +$${d.amount.toFixed(2)} (${d.date}) ${d.description ? "— " + escapeHtml(d.description) : ""} <button onclick="editDeposit(${i})" class='text-xs text-blue-500 ml-2'>✏️</button> <button onclick="deleteDeposit(${i})" class='text-xs text-red-500 ml-1'>❌</button></li>`).join("");
-    expenseList.innerHTML = filteredExpenses.map((e, i) => `<li class="animate-fadeIn">💸 ${e.category || "Uncategorized"}: -$${e.amount.toFixed(2)} (${e.date}) ${e.description ? "— " + escapeHtml(e.description) : ""} <button onclick="editExpense(${i})" class='text-xs text-blue-500 ml-2'>✏️</button> <button onclick="deleteExpense(${i})" class='text-xs text-red-500 ml-1'>❌</button></li>`).join("");
-
-    // Category totals
-    const catTotals = state.expenses.reduce((acc, e) => {
-        const c = e.category || "Uncategorized";
-        acc[c] = (acc[c] || 0) + e.amount;
-        return acc;
-    }, {});
-    categoryTotals.innerHTML = Object.entries(catTotals).map(([cat, amt]) => `<li>${escapeHtml(cat)}: $${amt.toFixed(2)}</li>`).join("") || "<li>No data yet.</li>";
-
-    // Pie chart
-    expenseChart.data.labels = Object.keys(catTotals);
-    expenseChart.data.datasets[0].data = Object.values(catTotals);
-    expenseChart.data.datasets[0].backgroundColor = Object.keys(catTotals).map((_, i) => `hsl(${i * 50},70%,60%)`);
-    expenseChart.update();
-
-    // Monthly bar chart
-    const months = {};
-    [...state.expenses, ...state.deposits].forEach(t => {
-        const m = monthKey(t.date);
-        if (!months[m]) months[m] = {exp:0, dep:0};
-        months[m][t.category ? 'exp' : 'dep'] += t.amount;
-    });
-    const labels = Object.keys(months).sort();
-    monthlyChart.data.labels = labels;
-    monthlyChart.data.datasets[0].data = labels.map(m => months[m].dep);
-    monthlyChart.data.datasets[1].data = labels.map(m => months[m].exp);
-    monthlyChart.update();
-
-    // Progress bar
-    const totalProgressBarDeposits = state.deposits.reduce((a, b) => a + b.amount, 0);
-    const totalProgressBarExpenses = state.expenses.reduce((a, b) => a + b.amount, 0);
-    const percent = totalProgressBarDeposits > 0 ? Math.max(0, ((totalProgressBarDeposits - totalProgressBarExpenses) / totalProgressBarDeposits) * 100) : 100;
-    progressBar.style.width = percent + "%";
-    progressBar.className = "h-4 rounded-full transition-all duration-500 " + (percent > 50 ? "bg-green-500" : percent > 20 ? "bg-yellow-500" : "bg-red-500");
-
-    updateGoalUI();
-    updateAssistant();
-    updateRecurringList();
-    save();
-}
-
-function updateGoalUI() {
-    if (state.goal.amount > 0) {
-        goalArea.classList.remove("hidden");
-        goalNameEl.textContent = state.goal.name;
-        goalAmountEl.textContent = state.goal.amount.toFixed(2);
-        const percent = Math.min(100, (state.balance / state.goal.amount) * 100);
-        goalProgress.style.width = percent + "%";
-        goalPercentEl.textContent = percent.toFixed(1);
-        goalStatus.classList.toggle("hidden", state.balance < state.goal.amount);
-    } else {
-        goalArea.classList.add("hidden");
+function updateBudgetUI(catTotals) {
+    budgetList.innerHTML = "";
+    if(Object.keys(state.budgets).length === 0) { budgetList.innerHTML = "<li>No budgets set.</li>"; return; }
+    for(const [cat, budget] of Object.entries(state.budgets)) {
+        const spent = catTotals[cat] || 0;
+        const pct = Math.min(100, (spent/budget)*100);
+        const color = pct >= 100 ? 'bg-red-500' : (pct > 75 ? 'bg-yellow-500' : 'bg-green-500');
+        const li = document.createElement('li');
+        li.innerHTML = `<div class="flex justify-between items-center mb-1"><span class="font-semibold">${escapeHtml(cat)}</span><span class="text-sm">$${spent.toFixed(2)} of $${budget.toFixed(2)} <button onclick="deleteBudget('${cat.replace(/'/g,"\\'")}')" class="text-xs text-red-500">❌</button></span></div><div class="w-full bg-gray-200 rounded-full h-4"><div class="${color} h-4 rounded-full transition-all duration-500" style="width: ${pct}%"></div></div>`;
+        budgetList.appendChild(li);
     }
 }
 
 // ===== SMART ASSISTANT =====
 function updateAssistant() {
+    let insights = [];
     const month = currentMonthKey();
-    const monthCat = state.expenses.filter(e => monthKey(e.date) === month).reduce((acc, e) => {
-        const c = e.category || "Uncategorized";
-        acc[c] = (acc[c] || 0) + e.amount;
-        return acc;
-    }, {});
+    const totalRecurring = state.recurring.reduce((sum, r) => sum + r.amount, 0);
 
+    const currentNW = calculateNetWorth();
+    const lastNWLog = state.netWorthHistory.length > 1 ? state.netWorthHistory[state.netWorthHistory.length - 2] : null;
+    if (lastNWLog) {
+        const change = currentNW - lastNWLog.amount;
+        insights.push(change > 0 ? `💎 **Net Worth**: Up $${change.toFixed(2)} since last log.` : `⚠️ **Net Worth**: Down $${Math.abs(change).toFixed(2)} since last log.`);
+    }
+
+    if (totalRecurring > 0) {
+        if (state.balance < totalRecurring) insights.push(`🚨 **Alert**: Balance < Monthly Bills ($${totalRecurring.toFixed(2)}).`);
+        else if (state.balance < totalRecurring * 3) insights.push(`🛡️ **Safety**: Balance covers ${Math.floor(state.balance/totalRecurring)} months of bills.`);
+    }
+
+    const monthCat = state.expenses.filter(e => monthKey(e.date) === month).reduce((acc, e) => { const c = e.category || "Uncategorized"; acc[c] = (acc[c] || 0) + e.amount; return acc; }, {});
     const topSpend = Object.entries(monthCat).sort((a,b) => b[1]-a[1])[0];
-    let suggestionHTML = "";
-    if (topSpend) {
-        const [topCat, topAmt] = topSpend;
-        const suggestedCut = topAmt >= 250 ? 50 : (topAmt >= 100 ? 25 : 10);
-        suggestionHTML = `<li>💡 You spent <b>$${topAmt.toFixed(2)}</b> on <b>${escapeHtml(topCat)}</b> this month. Consider reducing by <b>$${suggestedCut}</b>.</li>`;
-    }
+    if (topSpend) insights.push(`💸 **Spending**: Top category this month is **${escapeHtml(topSpend[0])}** ($${topSpend[1].toFixed(2)}).`);
 
-    let forecastHTML = "";
-    if (state.goal.amount > 0 && state.balance < state.goal.amount) {
-        const remaining = state.goal.amount - state.balance;
-        const weeklyNet = averageWeeklyNet(4);
-        if (weeklyNet > 0) {
-            const weeks = Math.ceil(remaining / weeklyNet);
-            forecastHTML = `<li>📈 At your recent pace (~$${weeklyNet.toFixed(0)}/week), you'll reach your <b>${escapeHtml(state.goal.name)}</b> goal in about <b>${weeks} week${weeks>1?'s':''}</b>.</li>`;
-        } else {
-            forecastHTML = `<li>⚠️ Your recent weekly net is not positive. Increase savings or cut spending to reach your goal.</li>`;
-        }
-    }
-    
-    if (!suggestionHTML && !forecastHTML) {
-        assistantInsights.innerHTML = `<p class="text-sm text-gray-500">Add data to see insights.</p>`;
-        return;
-    }
-    assistantInsights.innerHTML = `<ul class="list-disc pl-5 space-y-1">${suggestionHTML}${forecastHTML}</ul>`;
+    assistantInsights.innerHTML = insights.length ? `<ul class="list-disc pl-5 space-y-1">${insights.map(i => `<li>${i}</li>`).join('')}</ul>` : `<p class="text-sm text-gray-500">Add data to see insights.</p>`;
 }
 
-function averageWeeklyNet(weeksBack = 4) {
-    const start = new Date(Date.now() - weeksBack * 7 * 24 * 60 * 60 * 1000);
-    const inRange = dateStr => new Date(dateStr) >= start;
-    const dep = state.deposits.reduce((s, d) => s + (inRange(d.date) ? d.amount : 0), 0);
-    const exp = state.expenses.reduce((s, e) => s + (inRange(e.date) ? e.amount : 0), 0);
-    return (dep - exp) / Math.max(1, weeksBack);
-}
-
-function escapeHtml(s) {
-    return String(s).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
-}
-
-// ===== CRUD + FORMS =====
-function deleteDeposit(i){ state.balance -= state.deposits.splice(i,1)[0].amount; updateUI(); }
-function deleteExpense(i){ state.balance += state.expenses.splice(i,1)[0].amount; updateUI(); }
-function deleteAsset(i){ state.assets.splice(i,1); updateUI(); }
-function deleteLiability(i){ state.liabilities.splice(i,1); updateUI(); }
-
-function editDeposit(i){
-    const v = prompt("Edit deposit amount:", state.deposits[i].amount);
-    if (v !== null && !isNaN(parseFloat(v))) {
-        state.balance += parseFloat(v) - state.deposits[i].amount;
-        state.deposits[i].amount = parseFloat(v);
-        updateUI();
-    }
-}
-function editExpense(i){
-    const v = prompt("Edit expense amount:", state.expenses[i].amount);
-    if (v !== null && !isNaN(parseFloat(v))) {
-        state.balance += state.expenses[i].amount - parseFloat(v);
-        state.expenses[i].amount = parseFloat(v);
-        updateUI();
-    }
-}
-
-function quickAdd(category, amount, description="") {
-    state.balance -= amount;
-    state.expenses.push({ category, amount, description, date: todayISO() });
+// ===== ACTIONS =====
+function contributeToGoal(index) {
+    const goal = state.goals[index];
+    const amt = parseFloat(prompt(`Amount to move from Balance to ${goal.name}?`));
+    if(!amt || amt <= 0) return;
+    if(amt > state.balance) { alert("Insufficient liquid balance."); return; }
+   
+    state.balance -= amt;
+    goal.saved += amt;
+   
+    state.expenses.push({
+        category: "Financial Goal",
+        amount: amt,
+        description: `Transfer to ${goal.type}: ${goal.name}`,
+        date: todayISO()
+    });
+   
     updateUI();
 }
 
-// ===== INITIALIZATION & EVENT LISTENERS =====
+function deleteGoal(index) {
+    if(confirm("Delete this goal?")) {
+        state.goals.splice(index, 1);
+        updateUI();
+    }
+}
+
+function quickAdd(cat, amt, desc) { state.balance -= amt; state.expenses.push({category:cat, amount:amt, description:desc, date:todayISO()}); updateUI(); }
+function deleteDeposit(i) { state.balance -= state.deposits.splice(i,1)[0].amount; updateUI(); }
+function deleteExpense(i) { state.balance += state.expenses.splice(i,1)[0].amount; updateUI(); }
+function deleteAsset(i) { state.assets.splice(i,1); updateUI(); }
+function deleteLiability(i) { state.liabilities.splice(i,1); updateUI(); }
+function deleteRecurring(i) { state.recurring.splice(i,1); updateUI(); }
+function deleteBudget(c) { delete state.budgets[c]; updateUI(); }
+
+// ===== SMART PARSERS =====
+const CATEGORY_RULES = [
+    { cat: "Housing", keys: ["rent", "mortgage", "hoa"] },
+    { cat: "Utilities", keys: ["electric", "gas", "water", "internet"] },
+    { cat: "Groceries", keys: ["groceries", "kroger", "whole foods", "costco"] },
+    { cat: "Dining Out", keys: ["restaurant", "starbucks", "coffee", "uber eats"] },
+    { cat: "Auto", keys: ["gas", "fuel", "car", "uber"] },
+    { cat: "Misc", keys: ["misc"] }
+];
+function autoCategoryFromText(text) {
+    if (!text) return "Misc";
+    text = text.toLowerCase();
+    for (const r of CATEGORY_RULES) if (r.keys.some(k => text.includes(k))) return r.cat;
+    return "Misc";
+}
+function autoDetectGoalType(text) {
+    return ["debt","loan","card","payoff"].some(k => text.toLowerCase().includes(k)) ? "liability" : "asset";
+}
+function parseSmartAdd(input) {
+    const amountMatch = input.match(/\$?(\d+\.?\d*)/);
+    if (!amountMatch) return { error: "No amount found." };
+    const amount = parseFloat(amountMatch[1]);
+    const clean = input.replace(amountMatch[0], '').toLowerCase();
+    let intent = "expense";
+    if (["deposit","add","income"].some(k => clean.includes(k))) intent = "deposit";
+    if (["goal","save"].some(k => clean.includes(k))) intent = "goal";
+    return { intent, amount, description: input.replace(amountMatch[0], '').trim() || "Smart Add", date: todayISO() };
+}
+function smartAddLine() {
+    const input = document.getElementById('smartAddInput');
+    const res = parseSmartAdd(input.value);
+    if(res.error) { alert(res.error); return; }
+   
+    if(res.intent === 'deposit') { state.balance+=res.amount; state.deposits.push(res); }
+    else if(res.intent === 'goal') {
+        state.goals.push({ name: res.description, amount: res.amount, saved: 0, type: "asset" });
+    } else {
+        state.balance-=res.amount; state.expenses.push({ ...res, category: autoCategoryFromText(res.description) });
+    }
+    input.value=""; updateUI();
+}
+
+// ===== INIT LISTENERS =====
 document.addEventListener("DOMContentLoaded", () => {
-    applyRecurringExpenses();
-    updateUI();
-    populateCategoryDatalist();
+    const dl = document.getElementById('category-suggestions');
+    [...new Set(CATEGORY_RULES.map(r=>r.cat))].sort().forEach(c => dl.innerHTML += `<option value="${c}"></option>`);
 
-    document.getElementById('depositForm').addEventListener('submit', e => {
-        e.preventDefault();
-        const amount = parseFloat(e.target[0].value);
-        const description = e.target[1].value;
-        if (amount > 0) {
-            state.balance += amount;
-            state.deposits.push({ amount, description, date: todayISO() });
-            e.target.reset();
-            updateUI();
-        }
-    });
-
-    const expenseForm = document.getElementById('expenseForm');
-    const expenseDescEl = document.getElementById('expenseDesc');
-    const expenseCatEl = document.getElementById('expenseCategory');
-    
-    // Auto-suggest category from description
-    expenseDescEl.addEventListener('input', () => {
-        if (!categoryManuallyEdited) {
-            expenseCatEl.value = autoCategoryFromText(expenseDescEl.value);
-        }
-    });
-    expenseCatEl.addEventListener('input', () => { categoryManuallyEdited = true; });
-
-    expenseForm.addEventListener('submit', e => {
-        e.preventDefault();
-        const amount = parseFloat(document.getElementById('expenseAmount').value);
-        if (amount > 0) {
-            const desc = expenseDescEl.value;
-            const cat = expenseCatEl.value || autoCategoryFromText(desc) || "Miscellaneous";
-            const isRecurring = document.getElementById('recurringExpense').checked;
-            
-            if (isRecurring) {
-                state.recurring.push({ category: cat, amount: amount, description: desc });
-            } else {
-                state.balance -= amount;
-                state.expenses.push({ category: cat, amount: amount, description: desc, date: todayISO() });
-            }
-            e.target.reset();
-            categoryManuallyEdited = false; // Reset flag after submission
-            updateUI();
-        }
-    });
-
-    document.getElementById('assetForm').addEventListener('submit', e => {
-        e.preventDefault();
-        const name = e.target[0].value;
-        const amount = parseFloat(e.target[1].value);
-        if (name && amount >= 0) {
-            state.assets.push({name, amount});
-            e.target.reset();
-            updateUI();
-        }
-    });
-
-    document.getElementById('liabilityForm').addEventListener('submit', e => {
-        e.preventDefault();
-        const name = e.target[0].value;
-        const amount = parseFloat(e.target[1].value);
-        if (name && amount >= 0) {
-            state.liabilities.push({name, amount});
-            e.target.reset();
-            updateUI();
-        }
-    });
-
+    document.getElementById('depositForm').addEventListener('submit', e => { e.preventDefault(); const a=parseFloat(e.target[0].value); if(a>0){ state.balance+=a; state.deposits.push({amount:a, description:e.target[1].value, date:todayISO()}); e.target.reset(); updateUI(); }});
+    document.getElementById('expenseForm').addEventListener('submit', e => { e.preventDefault(); const a=parseFloat(document.getElementById('expenseAmount').value); if(a>0){ const c=document.getElementById('expenseCategory').value||autoCategoryFromText(document.getElementById('expenseDesc').value); if(document.getElementById('recurringExpense').checked) state.recurring.push({category:c, amount:a}); else { state.balance-=a; state.expenses.push({category:c, amount:a, description:document.getElementById('expenseDesc').value, date:todayISO()}); } e.target.reset(); updateUI(); }});
+    document.getElementById('assetForm').addEventListener('submit', e => { e.preventDefault(); state.assets.push({name:e.target[0].value, amount:parseFloat(e.target[1].value)}); e.target.reset(); updateUI(); });
+    document.getElementById('liabilityForm').addEventListener('submit', e => { e.preventDefault(); state.liabilities.push({name:e.target[0].value, amount:parseFloat(e.target[1].value)}); e.target.reset(); updateUI(); });
+   
+    // MULTI-GOAL FORM LISTENER
     goalForm.addEventListener('submit', e => {
         e.preventDefault();
-        state.goal.name = e.target[0].value;
-        state.goal.amount = parseFloat(e.target[1].value);
+        state.goals.push({
+            name: document.getElementById('goalNameInput').value,
+            amount: parseFloat(document.getElementById('goalTargetInput').value),
+            saved: 0,
+            type: document.getElementById('goalTypeSelect').value
+        });
         e.target.reset();
         updateUI();
     });
-
-    document.getElementById('resetBtn').addEventListener('click', () => {
-        if (confirm("Are you sure you want to reset ALL data? This cannot be undone.")) {
-            localStorage.removeItem("financeData");
-            location.reload();
-        }
-    });
-
-    document.getElementById('exportBtn').addEventListener('click', () => {
-        const dataStr = JSON.stringify(state, null, 2);
-        const blob = new Blob([dataStr], {type: 'application/json'});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'finance_data.json';
-        a.click();
-        URL.revokeObjectURL(url);
-    });
-
+    goalNameInput.addEventListener('input', () => goalTypeSelect.value = autoDetectGoalType(goalNameInput.value));
+   
+    budgetForm.addEventListener('submit', e => { e.preventDefault(); state.budgets[e.target[0].value] = parseFloat(e.target[1].value); e.target.reset(); updateUI(); });
+    saveNotesBtn.addEventListener("click", () => { state.notes = notesTextarea.value; save(); saveNotesBtn.textContent="Saved!"; setTimeout(()=>saveNotesBtn.textContent="Save Notes", 2000); });
+   
+    document.getElementById('resetBtn').addEventListener('click', () => { if(confirm("Reset all data?")) { localStorage.removeItem("financeData"); location.reload(); } });
+    document.getElementById('exportBtn').addEventListener('click', () => { const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(state)],{type:'application/json'})); a.download='data.json'; a.click(); });
+   
     document.getElementById('importFile').addEventListener('change', e => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                try {
-                    const importedState = JSON.parse(event.target.result);
-                    // simple validation
-                    if ('balance' in importedState && 'expenses' in importedState) {
-                        state = importedState;
-                        updateUI();
-                    } else {
-                        alert("Invalid file format.");
-                    }
-                } catch (err) {
-                    alert("Error parsing file: " + err.message);
+        const f=e.target.files[0]; if(!f) return;
+        const r=new FileReader();
+        r.onload = evt => {
+            try {
+                if(f.name.endsWith('.csv')) {
+                    const lines = evt.target.result.split('\n').slice(1);
+                    let n=0;
+                    if(!confirm("Append transactions?")) state = {balance:0, deposits:[], expenses:[], recurring:[], goals:[], assets:[], liabilities:[], netWorthHistory:[], notes:"", budgets:{}};
+                    lines.forEach(l => {
+                        const p=l.split(','); if(p.length<3) return;
+                        const d=normalizeDate(p.shift()); const a=parseFloat(p.pop()); const desc=p.join(',').replace(/"/g,'').trim();
+                        if(isNaN(a)) return;
+                        if(a>0) state.deposits.push({amount:a, description:desc, date:d});
+                        else state.expenses.push({category:autoCategoryFromText(desc), amount:Math.abs(a), description:desc, date:d});
+                        state.balance += a; n++;
+                    });
+                    alert(`Imported ${n} items.`);
+                } else {
+                    state = JSON.parse(evt.target.result);
+                    // Ensure compatibility
+                    if(!state.goals) state.goals = [];
+                    alert("Data loaded.");
                 }
-            };
-            reader.readAsText(file);
-        }
+                updateUI();
+            } catch(err) { alert("Error: "+err.message); }
+            e.target.value=null;
+        };
+        r.readAsText(f);
     });
+
+    updateUI();
 });
 </script>
 </body>
 </html>
-
